@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">	
+		<title>Copland</title>
+
+		<!-- build:css styles/styles.css -->
+		<link rel="stylesheet" href="styles/normalize.css">
+		<link rel="stylesheet" href="styles/styles.css">
+		<!-- endbuild -->
+
+	</head>
+	<body>
+		<div class="topbar"></div>
+		<div id="container">
+			<h1 class="title">Copland</h1>
+			<div id="app"></div>
+			<div class="btns">
+				<div class="open_info">info</div>
+				<div class="save_btn">save</div>
+				<div class="evolve_btn">evolve</div>
+			</div>
+			<div id="info"><button class="close">x</button></div>
+		</div>
+
+		<div class="saved_popup">
+			<div class="close">x</div>
+			<p>Share and listen to your creation with this url:</p>
+			<textarea></textarea>
+		</div>
+		<div id="res_popup">
+			<div id="popup_ui">
+				<h1>Gotta Load Some Audio Files</h1>
+				<h2 data-res="high">High Resolution</h2>
+				<p>or</p>
+				<h2 data-res="low">Low Resolution</h2>
+			</div>
+			<div id="perc"></div>
+		</div>
+		<div class="bottombar"></div>
+
+
+		<!--
+			All files in the following block will be concatenated into libs.js
+		-->
+
+		<!-- build:js scripts/libs.js -->
+
+		<script type="text/javascript" src="scripts/libs/jquery-1.8.2.min.js"></script>
+		<script type="text/javascript" src="scripts/libs/underscore.js"></script>
+		<script type="text/javascript" src="scripts/libs/Backbone.1.0.0.min.js"></script>
+		<script type="text/javascript" src="scripts/libs/howler.js"></script>
+		<script type="text/javascript" src="scripts/libs/Markdown.Converter.js"></script>
+		<script type="text/javascript" src="scripts/libs/base64.js"></script>
+		<script type="text/javascript" src="scripts/libs/rawinflate.js"></script>
+		<script type="text/javascript" src="scripts/libs/rawdeflate.js"></script>
+		<!-- endbuild -->
+
+
+        <!-- build:js scripts/main.js -->
+		<script type="text/javascript" src="scripts/Utils.js"></script>
+		<script type="text/javascript" src="scripts/Pad.js"></script>
+		<script type="text/javascript" src="scripts/Instrument.js"></script>
+		<script type="text/javascript" src="scripts/App.js"></script>
+		<script type="text/javascript" src="scripts/bootstrap.js"></script>
+		<!-- endbuild -->
+	</body>
+</html>
