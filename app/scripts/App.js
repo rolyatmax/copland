@@ -313,11 +313,13 @@ var App = (function($) {
 				backgroundColor: colors[index]
 			});
 			if (this.filesLoaded === this.filesToLoad) {
-				$('.bottombar').addClass("loaded").on("transitionend", function(e){
+				$('.bottombar').addClass("loaded").on("webkitTransitionEnd", onTransitionEnd);
+
+				function onTransitionEnd(e) {
 					if (e.originalEvent.propertyName !== "bottom") return;
 					that.startHerUp();
-					$(this).off("transitionend");
-				});
+					$(this).off("transitionend");				
+				}
 			}
 		},
 
