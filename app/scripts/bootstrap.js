@@ -12,8 +12,7 @@ var startHerUp = function( opts ) {
 	var converter = new Markdown.Converter();
 	$.get("README.md").then(function(text){
 		$("#info").append( converter.makeHtml(text) ).show();
-		$("#container").on('click', '.open_info', App.openInfo)
-			.on('click', '#info .close', App.closeInfo);
+		$("#container").on('click', '.open_info', App.toggleInfo);
 	});
 
 	if (opts && opts.resolution) {

@@ -146,14 +146,17 @@ var App = (function($) {
 
 		toggleInfo: function() {
 			$('#info').toggleClass('open');
+			$('#main_view').toggleClass('inactive');
 		},
 
 		openInfo: function(e) {
 			$('#info').addClass('open');
+			$('#main_view').addClass('inactive');
 		},
 
 		closeInfo: function(e) {
 			$('#info').removeClass('open');
+			$('#main_view').removeClass('inactive');
 		},
 
 		closeSavedPopup: function() {

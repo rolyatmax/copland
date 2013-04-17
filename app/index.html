@@ -11,34 +11,35 @@
 
 	</head>
 	<body>
-		<div class="topbar"></div>
-		<div id="container">
-			<h1 class="title">Copland</h1>
-			<div id="app"></div>
-			<div class="btns">
-				<div class="open_info">info</div>
-				<div class="save_btn">save</div>
-				<div class="evolve_btn">evolve</div>
+		<div id="main_view">
+			<div class="topbar"></div>
+			<div id="container">
+				<h1 class="title">Copland</h1>
+				<div id="app"></div>
+				<div class="btns">
+					<div class="open_info">info</div>
+					<div class="save_btn">save</div>
+					<div class="evolve_btn">evolve</div>
+				</div>
 			</div>
-			<div id="info"><button class="close">x</button></div>
-		</div>
 
-		<div class="saved_popup">
-			<div class="close">x</div>
-			<p>Share and listen to your creation with this url:</p>
-			<textarea></textarea>
-		</div>
-		<div id="res_popup">
-			<div id="popup_ui">
-				<h1>Gotta Load Some Audio Files</h1>
-				<h2 data-res="high">High Resolution</h2>
-				<p>or</p>
-				<h2 data-res="low">Low Resolution</h2>
+			<div class="saved_popup">
+				<div class="close">x</div>
+				<p>Share and listen to your creation with this url:</p>
+				<textarea></textarea>
 			</div>
-			<div id="perc"></div>
+			<div id="res_popup">
+				<div id="popup_ui">
+					<h1>Gotta Load Some Audio Files</h1>
+					<h2 data-res="high">High Resolution</h2>
+					<p>or</p>
+					<h2 data-res="low">Low Resolution</h2>
+				</div>
+				<div id="perc"></div>
+			</div>
+			<div class="bottombar"></div>
 		</div>
-		<div class="bottombar"></div>
-
+		<div id="info"></div>
 		<!-- build:js scripts/libs.js -->
 
 		<script type="text/javascript" src="scripts/libs/jquery-1.8.2.min.js"></script>
