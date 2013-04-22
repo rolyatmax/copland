@@ -15,5 +15,5 @@ There are still a few little bugs and additions that need to be made. And report
 
 Also: I only have mp3 files for the project right now - which means it won't work in Firefox. Try Chrome or Safari instead.
 
-See it in action at [http://tbaldw.in/copland](http://tbaldw.in/copland)
-Check out the code on my GitHub profile: [http://github.com/rolyatmax/copland](http://github.com/rolyatmax/copland)
+See it in action at [http://tbaldw.in/copland](http://tbaldw.in/copland). 
+And check out the code on my GitHub profile: [http://github.com/rolyatmax/copland](http://github.com/rolyatmax/copland).
