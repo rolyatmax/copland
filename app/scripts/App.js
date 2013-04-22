@@ -3,6 +3,7 @@ var Copland = Copland || {};
 /////// App
 
 var App = (function($) {
+	"use strict";
 
 	var $el = $('#app');
 
@@ -12,11 +13,13 @@ var App = (function($) {
 	var BASE_URL = (function() {
 		return window.location.origin + window.location.pathname;
 	}());
+
 	var USE_TINY_URL = false;
 	var VERSION = "0.1";
 	var tempo = 400; // in ms
 	var PAD_WIDTH = 40;
 	var timeout = null;
+	var els = {};
 
 	/////// API
 	return {
@@ -30,7 +33,7 @@ var App = (function($) {
 			var that = this;
 
 			/////// SETUP THE SPRITE
-			var sprite_data1 = {
+			var spriteData1 = {
 				1 : [0,3000],
 				2 : [4000,3000],
 				3 : [8000,3000],
@@ -42,7 +45,7 @@ var App = (function($) {
 				9 : [32000,3000]
 			};
 
-			var sprite_data2 = {
+			var spriteData2 = {
 				1 : [35000, 8500],
 				2 : [45000, 8500],
 				3 : [54000, 8500],
@@ -54,21 +57,21 @@ var App = (function($) {
 				9 : [114000, 8500]
 			};
 
-			var instrument_data = [
+			var instrumentData = [
 				{
-					sprite_data: sprite_data1,
+					spriteData: spriteData1,
 					columns: 8,
 					urls: this.urls,
-					rhythmic_value: 1,
+					rhythmicValue: 1,
 					limit: false,
 					evolve: true,
 					colors: colors
 				},
 				{
-					sprite_data: sprite_data2,
+					spriteData: spriteData2,
 					columns: 8,
 					urls: this.urls,
-					rhythmic_value: 16,
+					rhythmicValue: 16,
 					limit: true,
 					evolve: true,
 					colors: colors
@@ -81,13 +84,13 @@ var App = (function($) {
 
 				var instruments = [];
 
-				for (var i = 0, len = instrument_data.length; i < len; i++) {
-					var data = instrument_data[i];
+				for (var i = 0, len = instrumentData.length; i < len; i++) {
+					var data = instrumentData[i];
 
 					var options = {
-						sprite_data: data.sprite_data,
+						spriteData: data.spriteData,
 						urls: data.urls,
-						rhythmic_value: data.rhythmic_value,
+						rhythmicValue: data.rhythmicValue,
 						columns: data.columns,
 						width: data.columns * PAD_WIDTH,
 						limit: data.limit,
@@ -101,6 +104,7 @@ var App = (function($) {
 			}());
 
 			this.render();
+			this.cacheElements();
 
 
 			///// Events
@@ -131,36 +135,48 @@ var App = (function($) {
 				that.toggleLoop();
 			});
 
-			$("#container").on('click', '.sounds_control', function(e) {
+			els.$container.on('click', '.sounds_control', function(e) {
 				that.clickSoundsControl.call(that, e);
 			}).on('click', '.save_btn', function(){
 				that.clickSave.call(that);
 			}).on('click', '.evolve_btn', function(){
 				that.toggleEvolve();
 			});
-			$('.saved_popup .close').on('click', function(){
+			els.$savedPopup.find('.close').on('click', function(){
 				that.closeSavedPopup.call(that);
 			});
 
 		},
 
+		cacheElements: function() {
+			els = {
+				$container: $('#container'),
+				$info: $('#info'),
+				$mainView: $('#main_view'),
+				$savedPopup: $('.saved_popup'),
+				$soundsControl: $('.sounds_control'),
+				$evolveBtn: $('.evolve_btn'),
+				$bottombar: $('.bottombar')
+			};
+		},
+
 		toggleInfo: function() {
-			$('#info').toggleClass('open');
-			$('#main_view').toggleClass('inactive');
+			els.$info.toggleClass('open');
+			els.$mainView.toggleClass('inactive');
 		},
 
 		openInfo: function(e) {
-			$('#info').addClass('open');
-			$('#main_view').addClass('inactive');
+			els.$info.addClass('open');
+			els.$mainView.addClass('inactive');
 		},
 
 		closeInfo: function(e) {
-			$('#info').removeClass('open');
-			$('#main_view').removeClass('inactive');
+			els.$info.removeClass('open');
+			els.$mainView.removeClass('inactive');
 		},
 
 		closeSavedPopup: function() {
-			$('.saved_popup').removeClass('show');
+			els.$savedPopup.removeClass('show');
 		},
 
 		render: function() {
@@ -178,11 +194,7 @@ var App = (function($) {
 		},
 
 		toggleLoop: function() {
-			if (timeout) {
-				this.stopLoop();
-			} else {
-				this.playLoop();
-			}
+			( timeout ? this.stopLoop : this.playLoop ).call( this );
 		},
 
 		playLoop: function() {
@@ -204,11 +216,11 @@ var App = (function($) {
 
 				if (beats % 8 === 0) {
 					var index = beats % colors.length;
-					$('.bottombar').css({ backgroundColor: colors[index] });
+					els.$bottombar.css({ backgroundColor: colors[index] });
 				}
 
 				_.each(that.instruments, function(instrument) {
-					if (beats % instrument.rhythmic_value === 0) {
+					if (beats % instrument.rhythmicValue === 0) {
 						instrument.playCol(instrument.currentCol % instrument.columns);
 						instrument.currentCol++;
 					}
@@ -233,12 +245,10 @@ var App = (function($) {
 
 		clickSoundsControl: function(e, colorIndex) {
 
-			var $control = e ? $(e.target) : $('.sounds_control');
-
 			this.changeAllSounds(colorIndex);
 			var color = this.instruments[0].color();
 
-			$control.css({
+			els.$soundsControl.css({
 				backgroundColor: color
 			});
 		},
@@ -263,7 +273,7 @@ var App = (function($) {
 					if (instrument.evolve) { instrument.startEvolve(); }
 				});
 				this.evolving = true;
-				$('.evolve_btn').addClass('evolving');
+				els.$evolveBtn.addClass('evolving');
 			}
 		},
 
@@ -273,7 +283,7 @@ var App = (function($) {
 					if (instrument.timeouts.evolve) { instrument.stopEvolve(); }
 				});
 				this.evolving = false;
-				$('.evolve_btn').removeClass('evolving');
+				els.$evolveBtn.removeClass('evolving');
 			}
 		},
 
@@ -316,13 +326,11 @@ var App = (function($) {
 				backgroundColor: colors[index]
 			});
 			if (this.filesLoaded === this.filesToLoad) {
-				$('.bottombar').addClass("loaded").on("webkitTransitionEnd", onTransitionEnd);
-
-				function onTransitionEnd(e) {
+				$('.bottombar').addClass("loaded").on("webkitTransitionEnd", function(e) {
 					if (e.originalEvent.propertyName !== "bottom") return;
 					that.startHerUp();
-					$(this).off("transitionend");				
-				}
+					$(this).off("transitionend");
+				});
 			}
 		},
 
@@ -336,10 +344,17 @@ var App = (function($) {
 
 
 		clickSave: function() {
+
+			function showURL(url) {
+				els.$savedPopup.find('textarea').val( url )
+					.parent().addClass('show')
+					.css({ opacity: 1 });
+			}
+
 			var code = this.savePattern();
 			var url = BASE_URL + "#load/" + code;
 
-			$('.saved_popup').css({ opacity: 0.1 });
+			els.$savedPopup.css({ opacity: 0.1 });
 
 			if (!USE_TINY_URL) {
 				showURL(url);
@@ -351,12 +366,6 @@ var App = (function($) {
 					showURL(data.tinyurl);
 				}
 			);
-
-			function showURL(url) {
-				$('.saved_popup textarea').val( url )
-					.parent().addClass('show')
-					.css({ opacity: 1 });
-			}
 
 		},
 
@@ -375,7 +384,7 @@ var App = (function($) {
 		encodePattern: function() {
 			var pattern = {};
 
-			pattern.version = "0.1";
+			pattern.version = VERSION;
 			pattern.resolution = this.resolution;
 
 			pattern.instruments = [];
@@ -399,7 +408,7 @@ var App = (function($) {
 
 			var that = this;
 
-			if (pattern.version != this.VERSION) {
+			if (pattern.version !== VERSION) {
 				throw "This pattern was saved under a different version than the current version";
 			}
 
