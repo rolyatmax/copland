@@ -1,48 +1,46 @@
-
-// sb: hide
 var Copland = Copland || {};
-// sb end
 
-(function($) {
+(function() {
+	"use strict";
 
-/////// Utils
+	/////// Utils
 
-Copland.Utils = {};
+	Copland.Utils = {};
 
-Copland.Utils.getMostFilledCol = function() {
-	var columns_data = [];
+	Copland.Utils.getMostFilledCol = function() {
+		var columnsData = [];
 
-	for (var i = 0, len = this.columns; i < len; i++) {
-		var active = _.where(this.pads, {column: i, active: true});
-		columns_data.push({
-			column: i,
-			active: active,
-			active_count: active.length
-		});
-	}
+		for (var i = 0, len = this.columns; i < len; i++) {
+			var active = _.where(this.pads, {column: i, active: true});
+			columnsData.push({
+				column: i,
+				active: active,
+				activeCount: active.length
+			});
+		}
 
-	return _.max(columns_data, function(column){ return column.active_count; });
-};
+		return _.max(columnsData, function(column){ return column.activeCount; });
+	};
 
-Copland.Utils.getMostFilledRow = function() {
-	var rows_data = [];
+	Copland.Utils.getMostFilledRow = function() {
+		var rowsData = [];
 
-	for (var i = 0, len = this.rows; i < len; i++) {
-		var active = _.where(this.pads, {row: i, active: true});
-		rows_data.push({
-			row: i,
-			active: active,
-			active_count: active.length
-		});
-	}
+		for (var i = 0, len = this.rows; i < len; i++) {
+			var active = _.where(this.pads, {row: i, active: true});
+			rowsData.push({
+				row: i,
+				active: active,
+				activeCount: active.length
+			});
+		}
 
-	return _.max(rows_data, function(row){ return row.active_count; });
-};
+		return _.max(rowsData, function(row){ return row.activeCount; });
+	};
 
-Copland.Utils.random = function(low, high) {
+	Copland.Utils.random = function(low, high) {
 
-	var diff = high - low;
-	return (((diff * Math.random()) + 0.5) | 0) + low;
-};
+		var diff = high - low;
+		return (((diff * Math.random()) + 0.5) | 0) + low;
+	};
 
-}(jQuery));
+}());
