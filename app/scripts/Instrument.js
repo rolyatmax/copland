@@ -1,7 +1,7 @@
 var Copland = Copland || {};
 
 (function($) {
-	"use strict";
+	'use strict';
 
 	/////// Instrument
 
@@ -24,7 +24,7 @@ var Copland = Copland || {};
 
 		_.extend(this, options);
 
-		this.width = this.width + "px";
+		this.width = this.width + 'px';
 		this.$el = $('<div>').addClass('instrument');
 		this.pads = [];
 

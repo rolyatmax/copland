@@ -3,11 +3,11 @@ var Copland = Copland || {};
 /////// App
 
 var App = (function($) {
-	"use strict";
+	'use strict';
 
 	var $el = $('#app');
 
-	var colors = "#A67C87 #3F5573 #6A8AA6 #DAB6B6 #F2E4E4 #656975 #745D71".split(" ");
+	var colors = '#A67C87 #3F5573 #6A8AA6 #DAB6B6 #F2E4E4 #656975 #745D71'.split(' ');
 
 
 	var BASE_URL = (function() {
@@ -15,7 +15,7 @@ var App = (function($) {
 	}());
 
 	var USE_TINY_URL = false;
-	var VERSION = "0.1";
+	var VERSION = '0.1';
 	var tempo = 400; // in ms
 	var PAD_WIDTH = 40;
 	var timeout = null;
@@ -185,8 +185,8 @@ var App = (function($) {
 			}, this);
 
 			// Render Sounds Controller Button
-			var div = $("<div>")
-				.addClass("sounds_control")
+			var div = $('<div>')
+				.addClass('sounds_control')
 				.css({ backgroundColor: this.instruments[0].color() });
 
 			this.$el.append( div );
@@ -260,11 +260,9 @@ var App = (function($) {
 		},
 
 		toggleEvolve: function() {
-			if (this.evolving) {
-				this.stopEvolve();
-			} else {
-				this.startEvolve();
-			}
+
+			(this.evolving ? this.stopEvolve : this.startEvolve).call(this);
+
 		},
 
 		startEvolve: function() {
@@ -289,20 +287,20 @@ var App = (function($) {
 
 		setURLs: function() {
 			this.urls = [
-				"audio/morning_sprite.mp3",
-				"audio/morning_sprite2.mp3",
-				"audio/morning_sprite4.mp3",
-				"audio/morning_sprite5.mp3",
-				"audio/morning_sprite7.mp3",
-				"audio/morning_sprite9.mp3"
+				'audio/morning_sprite.mp3',
+				'audio/morning_sprite2.mp3',
+				'audio/morning_sprite4.mp3',
+				'audio/morning_sprite5.mp3',
+				'audio/morning_sprite7.mp3',
+				'audio/morning_sprite9.mp3'
 			];
 
-			if (Copland.low_res) {
+			if (Copland.lowRes) {
 				this.urls = [
-					"audio/lowest/morning_sprite_lowest.mp3",
-					"audio/lowest/morning_sprite2_lowest.mp3",
-					"audio/lowest/morning_sprite4_lowest.mp3",
-					"audio/lowest/morning_sprite5_lowest.mp3"
+					'audio/lowest/morning_sprite_lowest.mp3',
+					'audio/lowest/morning_sprite2_lowest.mp3',
+					'audio/lowest/morning_sprite4_lowest.mp3',
+					'audio/lowest/morning_sprite5_lowest.mp3'
 				];
 			}
 
@@ -318,7 +316,7 @@ var App = (function($) {
 		checkFileCount: function() {
 			var that = this;
 			var perc = ((this.filesLoaded / this.filesToLoad * 100) + 0.5) | 0;
-			perc += "%";
+			perc += '%';
 			var index = this.filesLoaded % colors.length;
 			$('#perc').text(perc);
 			$('.bottombar').css({
@@ -326,16 +324,16 @@ var App = (function($) {
 				backgroundColor: colors[index]
 			});
 			if (this.filesLoaded === this.filesToLoad) {
-				$('.bottombar').addClass("loaded").on("webkitTransitionEnd", function(e) {
-					if (e.originalEvent.propertyName !== "bottom") return;
+				$('.bottombar').addClass('loaded').on('webkitTransitionEnd', function(e) {
+					if (e.originalEvent.propertyName !== 'bottom') return;
 					that.startHerUp();
-					$(this).off("transitionend");
+					$(this).off('transitionend');
 				});
 			}
 		},
 
 		startHerUp: function() {
-			$("#res_popup").fadeOut();
+			$('#res_popup').fadeOut();
 			App.playLoop();
 		},
 
@@ -352,7 +350,7 @@ var App = (function($) {
 			}
 
 			var code = this.savePattern();
-			var url = BASE_URL + "#load/" + code;
+			var url = BASE_URL + '#load/' + code;
 
 			els.$savedPopup.css({ opacity: 0.1 });
 
@@ -409,7 +407,7 @@ var App = (function($) {
 			var that = this;
 
 			if (pattern.version !== VERSION) {
-				throw "This pattern was saved under a different version than the current version";
+				throw 'This pattern was saved under a different version than the current version';
 			}
 
 			var soundIndex = pattern.instruments[0].currentSoundIndex;
@@ -418,11 +416,11 @@ var App = (function($) {
 			_.each(this.instruments, function(instrument, i) {
 
 				if (instrument.rows != pattern.instruments[i].rows) {
-					throw "Error: saved instrument doesn't have the right number of rows";
+					throw 'Error: saved instrument does not have the right number of rows';
 				}
 
 				if (instrument.columns != pattern.instruments[i].columns) {
-					throw "Error: saved instrument doesn't have the right number of columns";
+					throw 'Error: saved instrument does not have the right number of columns';
 				}
 
 				var bits = pattern.instruments[i].bits;

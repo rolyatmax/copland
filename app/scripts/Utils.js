@@ -1,7 +1,7 @@
 var Copland = Copland || {};
 
 (function() {
-	"use strict";
+	'use strict';
 
 	/////// Utils
 

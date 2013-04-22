@@ -1,12 +1,12 @@
 var Copland = Copland || {};
 
 (function($) {
-	"use strict";
+	'use strict';
 
 	//////// Pad
 
 	Copland.Pad = function(options) {
-		if (!options.pitch) { throw "You must set a pitch to be played"; }
+		if (!options.pitch) { throw 'You must set a pitch to be played'; }
 
 		var that = this;
 
@@ -26,8 +26,6 @@ var Copland = Copland || {};
 		///// Click Event
 
 		this.$el.on('click', function(){
-
-			// console.log('row', that.row, 'col', that.column);
 
 			if (that.instrument.limit) {
 				that.instrument.clearCol(that.column);
@@ -62,7 +60,7 @@ var Copland = Copland || {};
 	Copland.Pad.prototype.offActive = function() {
 		this.active = false;
 		this.$el.removeClass('active');
-		this.$el.css({backgroundColor: "white"});
+		this.$el.css({backgroundColor: 'white'});
 	};
 
 	Copland.Pad.prototype.onActive = function() {
@@ -72,11 +70,8 @@ var Copland = Copland || {};
 	};
 
 	Copland.Pad.prototype.toggleActive = function() {
-		if (this.active) {
-			this.offActive();
-		} else {
-			this.onActive();
-		}
+
+		(this.active ? this.offActive : this.onActive).call(this);
 	};
 
 	Copland.Pad.prototype.toggleSilent = function() {
