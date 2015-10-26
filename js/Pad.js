@@ -1,82 +1,68 @@
-var Copland = Copland || {};
+import $ from 'jquery';
 
-(function($) {
-    'use strict';
-
-    //////// Pad
-
-    Copland.Pad = function(options) {
-        if (!options.pitch) { throw 'You must set a pitch to be played'; }
-
-        var that = this;
-
-        //// Setup Defaults
+export default class Pad {
+    constructor(options) {
+        if (options.pitch === undefined) {
+            throw new Error('You must set a pitch to be played');
+        }
 
         var defaults = {
             active: false,
             silent: false
         };
 
-        options = _.defaults(options, defaults);
-
-        _.extend(this, options);
+        Object.assign(this, defaults, options);
 
         this.$el = $('<div>').addClass('pad');
-
-        ///// Click Event
-
-        this.$el.on('click', function(){
-
-            if (that.instrument.limit) {
-                that.instrument.clearCol(that.column);
+        this.$el.on('click', () => {
+            if (this.instrument.limit) {
+                this.instrument.clearCol(this.column);
             }
-
-            that.toggleActive.call(that);
-
-            if (!that.silent) {
-                that.play.call(that);
+            this.toggleActive();
+            if (!this.silent) {
+                this.play();
             }
         });
+    }
 
-    };
-
-    Copland.Pad.prototype.pulse = function() {
+    pulse() {
         this.$el.css({
             opacity: 1,
             backgroundColor: this.instrument.color()
         });
         this.$el.animate({opacity: 0.65});
-    };
+    }
 
-    Copland.Pad.prototype.play = function() {
-        this.instrument.sound().play( this.pitch );
+    play() {
+        this.instrument.sound().play(this.pitch);
         this.pulse();
-    };
+    }
 
-    Copland.Pad.prototype.updateColor = function() {
-        this.$el.css({ backgroundColor: this.instrument.color() });
-    };
+    updateColor() {
+        this.$el.css({backgroundColor: this.instrument.color()});
+    }
 
-    Copland.Pad.prototype.offActive = function() {
+    offActive() {
         this.active = false;
         this.$el.removeClass('active');
         this.$el.css({backgroundColor: 'white'});
-    };
+    }
 
-    Copland.Pad.prototype.onActive = function() {
+    onActive() {
         this.active = true;
         this.$el.addClass('active');
         this.updateColor();
-    };
+    }
 
-    Copland.Pad.prototype.toggleActive = function() {
+    toggleActive() {
+        if (this.active) {
+            this.offActive();
+        } else {
+            this.onActive();
+        }
+    }
 
-        (this.active ? this.offActive : this.onActive).call(this);
-    };
-
-    Copland.Pad.prototype.toggleSilent = function() {
+    toggleSilent() {
         this.silent = !this.silent;
-    };
-
-
-}(jQuery));
+    }
+}

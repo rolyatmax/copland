@@ -1,7 +1,7 @@
 {
   "name": "copland",
   "version": "2.0.0",
-  "main": "main.js",
+  "main": "js/main.js",
   "scripts": {
     "test": "jest",
     "watch": "mkdir -p build && watchify js/main.js -o build/build.js -dv",
@@ -10,6 +10,9 @@
   },
   "author": "Taylor Baldwin <taylorbaldwin@gmail.com> (https://tbaldw.in)",
   "dependencies": {
+    "backbone": "^1.2.3",
+    "howler": "^1.1.28",
+    "jquery": "^2.1.4",
     "react": "^0.14.0",
     "react-dom": "^0.14.0"
   },
