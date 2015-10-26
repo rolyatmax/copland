@@ -1,6 +1,2 @@
-dist
-.tmp
-.sass-cache
-app/components
+build
 node_modules
-.DS_Store
