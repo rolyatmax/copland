@@ -4,6 +4,7 @@
   "main": "js/main.js",
   "scripts": {
     "test": "jest",
+    "build": "mkdir -p build && NODE_ENV=production browserify --full-paths js/main.js | uglifyjs -c -m --keep-fnames --screw-ie8 > build/build.js",
     "watch": "mkdir -p build && watchify js/main.js -o build/build.js -dv",
     "build": "mkdir -p build && browserify js/main.js -o build/build.js",
     "serve": "open http://localhost:9876 && python -m SimpleHTTPServer 9876",
@@ -11,10 +12,14 @@
   },
   "author": "Taylor Baldwin <taylorbaldwin@gmail.com> (https://tbaldw.in)",
   "dependencies": {
-    "backbone": "^1.2.3",
     "howler": "^1.1.28",
-    "jquery": "^2.1.4",
-    "markdown": "^0.5.0",
+    "keymirror": "^0.1.1",
+    "lz-string": "^1.4.4",
+    "react": "^0.14.1",
+    "react-dom": "^0.14.1",
+    "react-redux": "^4.0.0",
+    "redux": "^3.0.4",
+    "redux-logger": "^2.0.4",
     "underscore": "^1.8.3"
   },
   "devDependencies": {
@@ -22,14 +27,19 @@
     "babel-jest": "^5.3.0",
     "babelify": "^6.4.0",
     "browserify": "^11.2.0",
+    "envify": "^3.4.0",
     "eslint": "^1.7.3",
     "eslint-plugin-react": "^3.6.3",
     "jest-cli": "^0.6.1",
+    "markdownify": "^0.1.0",
+    "uglify-js": "^2.5.0",
     "watchify": "^3.4.0"
   },
   "browserify": {
     "transform": [
-      "babelify"
+      "babelify",
+      "markdownify",
+      "envify"
     ]
   },
   "jest": {
