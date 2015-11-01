@@ -5,6 +5,7 @@
   "scripts": {
     "test": "jest",
     "watch": "mkdir -p build && watchify js/main.js -o build/build.js -dv",
+    "build": "mkdir -p build && browserify js/main.js -o build/build.js",
     "serve": "open http://localhost:9876 && python -m SimpleHTTPServer 9876",
     "lint": "eslint ."
   },
@@ -13,8 +14,8 @@
     "backbone": "^1.2.3",
     "howler": "^1.1.28",
     "jquery": "^2.1.4",
-    "react": "^0.14.0",
-    "react-dom": "^0.14.0"
+    "markdown": "^0.5.0",
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "babel-eslint": "^4.1.3",
