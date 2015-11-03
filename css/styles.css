@@ -19,14 +19,15 @@
     font-weight: 200;
 }
 
-#main_view {
+#main-view {
+    left: 0;
     position: relative;
     -webkit-transition: left .5s cubic-bezier(0.23, 1, 0.32, 1);
        -moz-transition: left .5s cubic-bezier(0.23, 1, 0.32, 1);
             transition: left .5s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-#main_view.inactive {
+#main-view.inactive {
     left: 500px;
 }
 
@@ -43,7 +44,7 @@ h1.title {
     margin-top: 0;
 }
 
-.pad, .sounds_control {
+.pad, .sounds-control {
     height: 37px;
     width: 37px;
     border: 1px solid #eee;
@@ -54,7 +55,7 @@ h1.title {
     box-shadow: 0 0 8px rgba(50,50,50,0.3);
 }
 
-.sounds_control {
+.sounds-control {
     box-shadow: 0 0 5px rgba(100,100,100,0.1);
 }
 
@@ -74,7 +75,7 @@ h1.title {
     left: 2%;
 }
 
-.open_info, .save_btn, .evolve_btn {
+.open-info, .save-btn, .evolve-btn {
     display: inline-block;
     margin-right: 10px;
     background-color: #fff;
@@ -91,25 +92,25 @@ h1.title {
     text-align: left;
 }
 
-.open_info:hover, .save_btn:hover, .evolve_btn:hover {
+.open-info:hover, .save-btn:hover, .evolve-btn:hover {
     color: #777;
     box-shadow: none;
     letter-spacing: 0;
 }
 
-.open_info:hover {
+.open-info:hover {
     width: 1.6em;
 }
 
-.save_btn:hover {
+.save-btn:hover {
     width: 1.9em;
 }
 
-.evolve_btn:hover {
+.evolve-btn:hover {
     width: 2.6em;
 }
 
-.evolve_btn.evolving {
+.evolve-btn.evolving {
     background-color: rgb(106, 138, 166);
     color: #fff;
 }
@@ -123,8 +124,8 @@ h1.title {
     z-index: 10;
     text-align: left;
     padding: 30px 50px;
-    display: none;
     width: 400px;
+    height: 100%;
     position: absolute;
     top: 0;
     left: -500px;
@@ -156,7 +157,7 @@ h1.title {
     box-shadow: 0 0 20px rgba(100,100,100,0.1);
 }
 
-#res_popup {
+#res-popup, .loader {
     background-color: #fff;
     color: #242829;
     height: 100%;
@@ -168,16 +169,16 @@ h1.title {
     padding-top: 50px;
 }
 
-#popup_ui p {
+#popup-ui p {
     display: inline-block;
     padding: 0 10px;
 }
 
-#popup_ui.inactive {
+#popup-ui.inactive {
     color: #666;
 }
 
-#popup_ui h2, #popup_ui h3 {
+#popup-ui h2, .loader h3 {
     font-weight: 700;
     display: inline-block;
     padding: 10px 20px;
@@ -188,14 +189,14 @@ h1.title {
             transition: all .15s linear;
 }
 
-#popup_ui h2:hover {
+#popup-ui h2:hover {
     cursor: pointer;
     background-color: rgb(106, 138, 166);
     color: #fff;
     /* box-shadow: 0 1px 20px rgba(20,20,20,0.1); */
 }
 
-#popup_ui.inactive h2:hover {
+#popup-ui.inactive h2:hover {
     cursor: default;
     text-decoration: none;
 }
@@ -206,13 +207,12 @@ h1.title {
     color: #555;
 }
 
-#popup_ui {
+#popup-ui, .loader {
     color: #555;
-    display: none;
     text-transform: uppercase;
 }
 
-.saved_popup {
+.saved-popup {
     font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
     color: #555;
     opacity: 0;
@@ -230,7 +230,7 @@ h1.title {
     -moz-transition: top 1s cubic-bezier(0.23, 1, 0.32, 1), opacity .4s linear;
 }
 
-.saved_popup .close {
+.saved-popup .close {
     border: 1px solid #eee;
     display: inline;
     padding: 4px 8px;
@@ -244,16 +244,16 @@ h1.title {
             transition: color .25s linear;
 }
 
-.saved_popup .close:hover {
+.saved-popup .close:hover {
     color: #444;
 }
 
-.saved_popup.show {
+.saved-popup.show {
     top: 130px;
     opacity: 1;
 }
 
-.saved_popup textarea {
+.saved-popup textarea {
     width: 300px;
     height: 160px;
     font-family: monospace;
@@ -267,15 +267,15 @@ h1.title {
     bottom: 95%;
     left: 0;
     background-color: none;
-    transition: all 1s linear;
-    -webkit-transition: all 1s linear;
-    -moz-transition: all 1s linear;
+    transition: all 500ms ease;
+    -webkit-transition: all 500ms ease;
+    -moz-transition: all 500ms ease;
 }
 
 .bottombar.loaded {
     bottom: 0;
     width: 100%;
-    transition: background-color 2s linear, bottom 1s cubic-bezier(.4,1,.32,1) .8s, width .5s linear;
-    -webkit-transition: background-color 2s linear, bottom 1s cubic-bezier(.4,1,.32,1) .8s, width .5s linear;
-    -moz-transition: background-color 2s linear, bottom 1s cubic-bezier(.4,1,.32,1) .8s, width .5s linear;
+    transition: background-color 2s linear, bottom 800ms cubic-bezier(.4,1,.32,1) 200ms, width 200ms ease;
+    -webkit-transition: background-color 2s linear, bottom 800ms cubic-bezier(.4,1,.32,1) 200ms, width 200ms ease;
+    -moz-transition: background-color 2s linear, bottom 800ms cubic-bezier(.4,1,.32,1) 200ms, width 200ms ease;
 }
