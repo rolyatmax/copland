@@ -25,7 +25,7 @@ class App extends React.Component {
             '13': actions.togglePlaying, // space
             '32': actions.togglePlaying // enter
         };
-        this.onKeydown = e => (keyBindings[e.which] || () => {})(e);
+        this.onKeydown = e => (keyBindings[e.which] || (() => {}))(e);
     }
 
     componentDidMount() {
