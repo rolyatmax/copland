@@ -11,7 +11,6 @@ let {togglePad, setResolution} = creators;
 const VERS = 'v';
 const RESOLUTION = 'r';
 const INSTRUMENTS = 'i';
-const MEASURE_LENGTH = 'm';
 const SOUNDS = 's';
 const ACTIVE = 'a';
 
