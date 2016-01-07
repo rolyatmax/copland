@@ -46,8 +46,7 @@
           ]
         }
       ],
-      "markdownify",
-      "envify"
+      "markdownify"
     ]
   },
   "jest": {

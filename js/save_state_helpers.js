@@ -1,6 +1,6 @@
 import {VERSION} from './constants';
 import {creators} from './actions';
-import {dispatch} from './store';
+import store from './store';
 import {
     compressToEncodedURIComponent, decompressFromEncodedURIComponent
 } from 'lz-string';
@@ -47,7 +47,7 @@ export function loadPattern(encodedString) {
         );
     }
 
-    dispatch(setResolution(resolution));
+    store.dispatch(setResolution(resolution));
     instruments.forEach((data, instrument) => {
         let {
             [SOUNDS]: sounds,
@@ -57,7 +57,7 @@ export function loadPattern(encodedString) {
             if (parseInt(isActive, 10)) {
                 let row = i % sounds;
                 let column = (i / sounds) | 0;
-                dispatch(togglePad({instrument, row, column}));
+                store.dispatch(togglePad({instrument, row, column}));
             }
         });
     });
