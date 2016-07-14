@@ -14,7 +14,7 @@ class Board extends React.Component {
         return (
             <div>
                 {instruments.map((instrument, i) =>
-                    <Instrument {...{instrument, actions, i, currentTick, playing}} />
+                    <Instrument {...{instrument, actions, i, currentTick, playing, key: i}} />
                 )}
                 <PaletteSelector {...{instruments, actions}} />
             </div>

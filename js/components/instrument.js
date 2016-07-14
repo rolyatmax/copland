@@ -18,6 +18,7 @@ class Instrument extends React.Component {
             <div className="instrument" style={style}>
                 {active.map((pads, column) =>
                     <Column
+                        key={column}
                         instrument={i}
                         pulsing={playing && (currentTick / duration) % measureLength === column}
                         {...{actions, pads, column, soundPalette}} />

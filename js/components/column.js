@@ -17,6 +17,7 @@ class Column extends React.Component {
             let active = pads[row];
             els.push(
                 <Pad
+                    key={row}
                     pulsing={pulsing && active}
                     {...{column, row, active, actions, instrument, soundPalette}}
                 />
