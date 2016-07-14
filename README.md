@@ -1,7 +1,7 @@
 copland
 =======
 
-Check out [this loop](https:tbaldw.in/copland/#/b924824000w08000k0a10PIwe) I made. Click around a bit and make it your own!
+Check out [this loop](https://tbaldw.in/copland/#/b924824000w08000k0a10PIwe) I made. Click around a bit and make it your own!
 
 ![copland](/images/1.png?raw=true "copland")
 
