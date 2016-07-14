@@ -48,7 +48,15 @@ export function generateHash({resolution, instruments}) {
 
 
 export function loadPattern(encodedString) {
-    const settings = decodeObject(encodedString);
+    let settings;
+    try {
+        settings = decodeObject(encodedString);
+    } catch (e) {
+        alert('This link is for an old version of this application and is no longer valid.');
+        document.location.hash = '';
+        return;
+    }
+
     store.dispatch(setResolution(resolutions[settings.resolution]));
 
     settings.stringsActive.toString().split('').forEach((activeRow, column) => {
