@@ -1,64 +1,74 @@
-import {VERSION} from './constants';
 import {creators} from './actions';
 import store from './store';
-import {
-    compressToEncodedURIComponent, decompressFromEncodedURIComponent
-} from 'lz-string';
+import createEncoder from 'encode-object';
+import leftPad from 'left-pad';
 
 
 let {togglePad, setResolution} = creators;
 
-const VERS = 'v';
-const RESOLUTION = 'r';
-const INSTRUMENTS = 'i';
-const SOUNDS = 's';
-const ACTIVE = 'a';
+const SOUNDS_COUNT = 9;
+const COLUMN_COUNT = 8;
+
+let encoderConfig = {
+    resolution: ['int', 1], // resolution - ['high', 'low']
+    stringsActive: ['int', 8] // only 8 columns, one active pad per column
+};
+
+
+const digits = Math.pow(2, SOUNDS_COUNT).toString().length;
+let i = COLUMN_COUNT;
+while (i--) {
+     // each column has 9 pads, 2^9 - 1 = 511
+    encoderConfig[`c${i}`] = ['int', digits];
+}
+
+
+const { encodeObject, decodeObject } = createEncoder(encoderConfig);
+const resolutions = ['low', 'high'];
 
 export function generateHash({resolution, instruments}) {
-    let pattern = JSON.stringify({
-        [VERS]: VERSION,
-        [RESOLUTION]: resolution,
-        [INSTRUMENTS]: instruments.map(instrument => {
-            let {sounds, active} = instrument;
-            return {
-                [SOUNDS]: sounds,
-                [ACTIVE]: active.map(column =>
-                    column.map(isActive => isActive ? 1 : 0).join('')
-                ).join('')
-            };
-        })
+    // works because SOUNDS_COUNT === 9
+    let stringsActive = instruments[1].active.map(col => {
+        let activePad = col.find(isActive => isActive);
+        return activePad ? col.indexOf(activePad) + 1 : 0;
+    }).join('');
+
+    let settings = {
+        resolution: resolutions.indexOf(resolution),
+        stringsActive: stringsActive
+    };
+
+    instruments[0].active.map((col, j) => {
+        let bits = col.map(isActive => isActive ? 1 : 0).join('');
+        settings[`c${j}`] = parseInt(bits, 2);
     });
-    return compressToEncodedURIComponent(pattern);
+
+    return encodeObject(settings);
 }
 
 
 export function loadPattern(encodedString) {
-    let decoded = decompressFromEncodedURIComponent(encodedString);
-    let pattern = JSON.parse(decoded);
-    let {
-        [VERS]: version,
-        [RESOLUTION]: resolution,
-        [INSTRUMENTS]: instruments
-    } = pattern;
+    const settings = decodeObject(encodedString);
+    store.dispatch(setResolution(resolutions[settings.resolution]));
 
-    if (version !== VERSION) {
-        throw new Error(
-            'This pattern was saved under a version that is no longer supported'
-        );
-    }
+    settings.stringsActive.toString().split('').forEach((activeRow, column) => {
+        let instrument = 1;
+        activeRow = parseInt(activeRow, 10);
+        if (activeRow) {
+            let row = activeRow - 1;
+            store.dispatch(togglePad({instrument, row, column}));
+        }
+    });
 
-    store.dispatch(setResolution(resolution));
-    instruments.forEach((data, instrument) => {
-        let {
-            [SOUNDS]: sounds,
-            [ACTIVE]: active
-        } = data;
-        active.split('').forEach((isActive, i) => {
+    for (let j = 0; j < COLUMN_COUNT; j++) {
+        let bits = settings[`c${j}`].toString(2);
+        leftPad(bits, SOUNDS_COUNT, '0').split('').forEach((isActive, k) => {
+            let instrument = 0;
+            let column = j;
             if (parseInt(isActive, 10)) {
-                let row = i % sounds;
-                let column = (i / sounds) | 0;
+                let row = k % SOUNDS_COUNT;
                 store.dispatch(togglePad({instrument, row, column}));
             }
         });
-    });
+    }
 }

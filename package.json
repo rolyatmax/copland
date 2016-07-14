@@ -10,9 +10,9 @@
   },
   "author": "Taylor Baldwin <taylorbaldwin@gmail.com> (https://tbaldw.in)",
   "dependencies": {
+    "encode-object": "^0.1.1",
     "howler": "^1.1.28",
     "keymirror": "^0.1.1",
-    "lz-string": "^1.4.4",
     "react": "^0.14.1",
     "react-dom": "^0.14.1",
     "react-redux": "^4.0.0",
