@@ -18,6 +18,8 @@ const copland = new Copland(instrumentConfig)
 const { hash } = document.location
 if (hash && hash.slice(0, 2) === '#/') {
   copland.loadFromHash(hash.slice(2))
+} else {
+  copland.randomizePads()
 }
 
 const root = createRoot(document.querySelector('#app'))

@@ -128,6 +128,24 @@ export default class Copland {
     this.triggerOnChange()
   }
 
+  randomizePads() {
+    // pick one sound for each column for the strings
+    const strings = this.instruments[1]
+    strings.pads.forEach((_, colIdx) => {
+      const rowIdx = Math.floor(Math.random() * strings.sounds)
+      this.togglePad(1, colIdx, rowIdx)
+    })
+
+    const piano = this.instruments[0]
+    piano.pads.forEach((rows, colIdx) => {
+      rows.forEach((_, rowIdx) => {
+        if (Math.random() < 0.1) {
+          this.togglePad(0, colIdx, rowIdx)
+        }
+      })
+    })
+  }
+
   nextSoundPalette() {
     this.instruments.forEach((instrument) => {
       instrument.soundPalette = (instrument.soundPalette + 1) % instrument.palettes.length
@@ -143,8 +161,10 @@ export default class Copland {
       .forEach((instrument) => {
         const { palettes, soundPalette, pads, measureLength } = instrument
         const curColumn = (this.currentTick / instrument.duration) % measureLength
+        const activePadsCount = pads[curColumn].filter(Boolean).length
         pads[curColumn].forEach((isActive, i) => {
           if (isActive) {
+            palettes[soundPalette].volume(1 / Math.pow(activePadsCount, 0.2))
             palettes[soundPalette].play(String(i + 1)) // pitches are 1-indexed
           }
         })
