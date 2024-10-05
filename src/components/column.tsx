@@ -6,13 +6,20 @@ interface ColumnProps {
   instrument: number
   column: number
   pads: any[]
-  togglePad: (opts: { instrument: number; column: number; row: number }) => void
+  togglePad: (instrument: number, column: number, row: number) => void
   soundPalette: number
   pulsing: boolean
 }
 
-export default function Column({ pads, column, togglePad, instrument, soundPalette, pulsing }: ColumnProps) {
-  const els: Pad[] = []
+export default function Column({
+  pads,
+  column,
+  togglePad,
+  instrument,
+  soundPalette,
+  pulsing,
+}: ColumnProps) {
+  const els: React.ReactElement[] = []
   let row = pads.length
   while (row--) {
     const active = pads[row]
@@ -21,10 +28,8 @@ export default function Column({ pads, column, togglePad, instrument, soundPalet
         key={row}
         pulsing={pulsing && active}
         {...{ column, row, active, instrument, soundPalette, togglePad }}
-      />
+      />,
     )
   }
-  return (
-    <div style={{ width: PAD_WIDTH, display: 'inline-block' }}>{els}</div>
-  )
+  return <div style={{ width: PAD_WIDTH, display: 'inline-block' }}>{els}</div>
 }

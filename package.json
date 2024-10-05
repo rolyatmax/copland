@@ -10,8 +10,13 @@
   },
   "dependencies": {
     "@types/howler": "^2.2.12",
+    "@types/react": "^18.3.11",
+    "bases": "^0.2.1",
     "howler": "^2.2.4",
+    "object-hash": "^3.0.0",
     "prettier": "^3.3.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "typescript": "^5.6.2",
     "vite": "^5.4.8"
   }

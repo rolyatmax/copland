@@ -1,23 +1,8 @@
-import React from 'react'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
-import { creators } from '../actions'
+import React, { useState, useEffect, useCallback } from 'react'
+import Copland from '../copland'
 import { COLORS } from '../constants'
-
-import Save from './save'
+// import Save from './save'
 import Board from './board'
-import type { AppState, Instrument } from '../types'
-
-type AppProps = {
-  appState: AppState
-  instruments: Instrument[]
-  actions: {
-    clearAllPads: () => void
-    toggleEvolving: () => void
-    toggleSave: () => void
-    togglePlaying: () => void
-  }
-}
 
 const TEXT_OPTS = [
   'Spinning Hamster Wheels',
@@ -31,78 +16,87 @@ const TEXT_OPTS = [
 
 const loadingText = TEXT_OPTS[Math.floor(Math.random() * TEXT_OPTS.length)]
 
-class App extends React.Component<AppProps> {
-  onKeydown = (e: KeyboardEvent) => {
-    e.preventDefault()
-    const keyBindings: Record<string, () => void> = {
-      Backspace: this.props.actions.clearAllPads,
-      KeyE: this.props.actions.toggleEvolving,
-      KeyS: this.props.actions.toggleSave,
-      Space: this.props.actions.togglePlaying,
-      Enter: this.props.actions.togglePlaying,
+export default function App({ copland }: { copland: Copland }) {
+  // const [showSave, setShowSave] = useState(false)
+  const [tick, setTick] = useState(0) // just used to trigger a re-render
+
+  const onKeydown = useCallback(
+    (e: KeyboardEvent) => {
+      e.preventDefault()
+      const keyBindings: Record<string, () => void> = {
+        Backspace: copland.clearAllPads.bind(copland),
+        // KeyE: copland.toggleEvolving.bind(copland),
+        // KeyS: () => setShowSave((show: boolean) => !show),
+        Space: copland.togglePlaying.bind(copland),
+        Enter: copland.togglePlaying.bind(copland),
+      }
+      keyBindings[e.code]?.()
+    },
+    [copland],
+  )
+
+  useEffect(() => {
+    const unsub = copland.addOnChange(() => {
+      console.log('rerender!', copland)
+      setTick((tick) => tick + 1)
+    })
+    document.addEventListener('keydown', onKeydown)
+    return () => {
+      document.removeEventListener('keydown', onKeydown)
+      unsub()
     }
-    const action = keyBindings[e.code] ?? (() => {})
-    action()
+  }, [copland, onKeydown])
+
+  const { currentTick, instruments, playing } = copland
+  const togglePad = copland.togglePad.bind(copland)
+  const nextSoundPalette = copland.nextSoundPalette.bind(copland)
+
+  const style = {
+    opacity: copland.ready ? 1 : 0,
+    transition: 'opacity 300ms linear 500ms',
   }
 
-  componentDidMount() {
-    document.addEventListener('keydown', this.onKeydown)
-  }
+  const perc = copland.loading ? ((copland.filesLoaded / copland.filesToLoad) * 100 + 0.5) | 0 : 100
+  const index = copland.loading ? copland.filesLoaded : copland.currentTick / 8 | 0
+  const backgroundColor = COLORS[index % COLORS.length]
 
-  componentWillUnmount() {
-    document.removeEventListener('keydown', this.onKeydown)
-  }
-
-  render() {
-    const { appState, actions, instruments } = this.props
-    const { showSave, showInfo, filesLoaded, filesToLoad, currentTick, evolving, playing } = appState
-    const { toggleSave, toggleEvolving, togglePad, changeSoundPalette } = actions
-    const isLoading = filesToLoad && filesLoaded < filesToLoad
-    const hasLoaded = filesToLoad && !isLoading
-
-    const style = {
-      opacity: hasLoaded ? 1 : 0,
-      transition: 'opacity 300ms linear 500ms',
-    }
-
-    const perc = isLoading ? ((filesLoaded / filesToLoad) * 100 + 0.5) | 0 : 100
-    const index = isLoading ? filesLoaded : (currentTick / 8) | 0
-    const backgroundColor = COLORS[index % COLORS.length]
-
-    return (
-      <div>
-        <div id="main-view" className={showInfo ? 'inactive' : ''}>
-          <div style={style}>
-            <div className="topbar"></div>
-            <div id="container">
-              <h1 className="title">Copland</h1>
-              {hasLoaded ? <Board {...{ currentTick, instruments, togglePad, changeSoundPalette, playing }} /> : null}
-              {hasLoaded ? <div className="btns">
-                <div onClick={toggleSave} className="save-btn">
+  return (
+    <div>
+      <div id="main-view">
+        <div style={style}>
+          <div className="topbar"></div>
+          <div id="container">
+            <h1 className="title">Copland</h1>
+            {copland.ready ? (
+              <Board {...{ currentTick, instruments, togglePad, nextSoundPalette, playing }} />
+            ) : null}
+            {/** TODO: TURN THIS BACK ON ONCE SAVE/EVOLVE ARE SET UP  */}
+            {/* {copland.ready ? (
+              <div className="btns">
+                <div onClick={() => setShowSave(true)} className="save-btn">
                   save
                 </div>
                 <div onClick={toggleEvolving} className={`evolve-btn ${evolving ? 'evolving' : ''}`}>
-                  evolve
-                </div>
-              </div> : null}
-            </div>
+                evolve
+              </div>
+              </div>
+            ) : null} */}
           </div>
-          {isLoading ? <div className="loader">
+        </div>
+        {copland.loading ? (
+          <div className="loader">
             <h3>{loadingText}...</h3>
             <div id="perc">{perc}%</div>
-          </div> : null}
-          {filesToLoad ? <div
-            className={`bottombar ${hasLoaded ? 'loaded' : ''}`}
+          </div>
+        ) : null}
+        {copland.filesToLoad ? (
+          <div
+            className={`bottombar ${copland.ready ? 'loaded' : ''}`}
             style={{ width: `${perc}%`, backgroundColor }}
-          /> : null}
-        </div>
-        <Save show={showSave} {...{ instruments, toggleSave }} />
+          />
+        ) : null}
       </div>
-    )
-  }
+      {/* <Save show={showSave} hideSave={() => setShowSave(false)} hash={copland.encodeState()} /> */}
+    </div>
+  )
 }
-
-export default connect(
-  ({ appState, instruments }) => ({ appState, instruments }),
-  (dispatch) => ({ actions: bindActionCreators(creators, dispatch) }),
-)(App)

@@ -1,9 +1,8 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
+import { createRoot } from 'react-dom/client'
 import App from './components/app.tsx'
-import store from './store.ts'
-import { loadPattern } from './save_state_helpers.ts'
+import Copland from './copland'
+import instrumentConfig from './instrument-config'
 import './normalize.css'
 import './styles.css'
 
@@ -14,14 +13,12 @@ if (!canPlayMP3 || canPlayMP3 === 'maybe') {
   throw new Error(msg)
 }
 
-const { hash } = document.location
-if (hash && hash.slice(0, 2) === '#/') {
-  loadPattern(hash.slice(2))
-}
+// const { hash } = document.location
+// if (hash && hash.slice(0, 2) === '#/') {
+//   copland.loadFromHash(hash.slice(2))
+// }
 
-ReactDOM.render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
-  document.querySelector('#app'),
-)
+const copland = new Copland(instrumentConfig)
+const root = createRoot(document.querySelector('#app'))
+
+root.render(<App copland={copland} />)

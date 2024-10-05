@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { changeSoundPalette, togglePad } from '../actions'
 import type { Action, Instrument } from '../types'
 
@@ -6,18 +8,7 @@ function sample<T>(arr: T[]): T {
 }
 
 function maxBy<T>(arr: T[], fn: (item: T) => number): T {
-  return arr.reduce((max, item) => fn(item) > fn(max) ? item : max, arr[0])
-}
-
-export const evolveLoop = (store) => (next) => (action: Action) => {
-  switch (action.type) {
-    case 'TOGGLE_EVOLVING':
-      toggleLoop(store)
-      break
-    default:
-      break
-  }
-  return next(action)
+  return arr.reduce((max, item) => (fn(item) > fn(max) ? item : max), arr[0])
 }
 
 let timeout: ReturnType<typeof setTimeout> | null = null
@@ -40,22 +31,24 @@ function toggleLoop(store) {
 }
 
 function getRowAndColumn(isActive: boolean, pads: boolean[][]): { column: number; row: number }[] {
-  return pads.reduce((collection: { column: number; row: number }[], rows: boolean[], column: number) => {
-    let row = rows.length
-    collection = collection.slice()
-    while (row--) {
-      if (isActive === rows[row]) {
-        collection.push({ column, row })
+  return pads.reduce(
+    (collection: { column: number; row: number }[], rows: boolean[], column: number) => {
+      let row = rows.length
+      collection = collection.slice()
+      while (row--) {
+        if (isActive === rows[row]) {
+          collection.push({ column, row })
+        }
       }
-    }
-    return collection
-  }, [])
+      return collection
+    },
+    [],
+  )
 }
 
 function evolveStep({ getState, dispatch }) {
   getState()
-    .instruments
-    .filter((instrument: Instrument) => {
+    .instruments.filter((instrument: Instrument) => {
       return instrument.evolve && Math.random() < 0.5
     })
     .forEach((instrument: Instrument, i: number) => {
@@ -120,13 +113,16 @@ function evolveStep({ getState, dispatch }) {
 
 function getMostFilledCol(activePads: boolean[][]) {
   let columnData = activePads.map((rows, column) => {
-    return rows.reduce((collection: { column: number; row: number }[], isActive: boolean, row: number) => {
-      collection = collection.slice()
-      if (isActive) {
-        collection.push({ column, row })
-      }
-      return collection
-    }, [])
+    return rows.reduce(
+      (collection: { column: number; row: number }[], isActive: boolean, row: number) => {
+        collection = collection.slice()
+        if (isActive) {
+          collection.push({ column, row })
+        }
+        return collection
+      },
+      [],
+    )
   })
 
   return maxBy(columnData, (column) => column.length)

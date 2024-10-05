@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 import { COLORS } from '../constants'
 
 type PadProps = {
@@ -7,70 +7,47 @@ type PadProps = {
   row: number
   active: boolean
   soundPalette: number
-  togglePad: (opts: { instrument: number; column: number; row: number }) => void
+  togglePad: (instrument: number, column: number, row: number) => void
+  pulsing: boolean
 }
 
-class Pad extends React.Component<PadProps> {
-  constructor(props) {
-    super(props)
-    this.state = {
-      color: props.active ? COLORS[props.soundPalette % COLORS.length] : 'white',
-      opacity: 0.65,
-      transition: 'none',
-    }
-  }
+export default function Pad({
+  instrument,
+  column,
+  row,
+  active,
+  soundPalette,
+  togglePad,
+  pulsing,
+}: PadProps) {
+  const [color, setColor] = useState(active ? COLORS[soundPalette % COLORS.length] : 'white')
+  const [opacity, setOpacity] = useState(0.65)
+  const [transition, setTransition] = useState('none')
 
-  onClick() {
-    let { instrument, column, row, active, soundPalette, togglePad } = this.props
+  const onClick = useCallback(() => {
     if (!active) {
-      this.setState({ color: COLORS[soundPalette % COLORS.length] })
+      setColor(COLORS[soundPalette % COLORS.length])
     }
-    togglePad({ instrument, column, row })
-  }
+    togglePad(instrument, column, row)
+  }, [instrument, column, row, active, soundPalette, togglePad])
 
-  componentWillReceiveProps(props) {
-    if (props.pulsing && !this.props.pulsing) {
-      this.setState({
-        opacity: 1,
-        transition: 'none',
-        color: COLORS[props.soundPalette % COLORS.length],
-      })
+  useEffect(() => {
+    if (pulsing) {
+      setOpacity(1)
+      setTransition('none')
+      setColor(COLORS[soundPalette % COLORS.length])
       setTimeout(() => {
-        this.setState({
-          opacity: 0.65,
-          transition: 'opacity 200ms linear',
-        })
+        setOpacity(0.65)
+        setTransition('opacity 400ms linear')
       }, 50)
     }
+  }, [pulsing])
+
+  const style = {
+    backgroundColor: active ? color : 'white',
+    opacity,
+    transition,
   }
 
-  render() {
-    let { active } = this.props
-    let { color, opacity, transition } = this.state
-    let style = {
-      backgroundColor: active ? color : 'white',
-      opacity,
-      transition,
-    }
-    return (
-      <div
-        ref="pad"
-        onClick={() => this.onClick()}
-        style={style}
-        className={`pad ${active ? 'active' : ''}`}
-      ></div>
-    )
-  }
+  return <div onClick={onClick} style={style} className={`pad ${active ? 'active' : ''}`} />
 }
-
-Pad.propTypes = {
-  instrument: React.PropTypes.number.isRequired,
-  column: React.PropTypes.number.isRequired,
-  row: React.PropTypes.number.isRequired,
-  actions: React.PropTypes.object.isRequired,
-  active: React.PropTypes.bool.isRequired,
-  soundPalette: React.PropTypes.number.isRequired,
-  pulsing: React.PropTypes.bool.isRequired,
-}
-
-export default Pad
