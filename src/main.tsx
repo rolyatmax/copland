@@ -3,8 +3,8 @@ import { createRoot } from 'react-dom/client'
 import App from './components/app.tsx'
 import Copland from './copland'
 import instrumentConfig from './instrument-config'
-import './normalize.css'
-import './styles.css'
+import './styles/normalize.css'
+import './styles/styles.css'
 
 const canPlayMP3 = new Audio().canPlayType('audio/mp3')
 if (!canPlayMP3 || canPlayMP3 === 'maybe') {
