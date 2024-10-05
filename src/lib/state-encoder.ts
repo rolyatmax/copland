@@ -1,20 +1,21 @@
-// @ts-nocheck
-
 import createEncoder from './encode-object'
 import type { EncoderConfig } from './encode-object'
 
 const SOUNDS_COUNT = 9
 const COLUMN_COUNT = 8
 
-const encoderConfig: EncoderConfig = {
-  stringsActive: ['int', COLUMN_COUNT], // only 8 columns, one active pad per column
-}
+const encoderConfig: EncoderConfig = {}
 
-const digits = Math.pow(2, SOUNDS_COUNT).toString().length
 let i = COLUMN_COUNT
 while (i--) {
-  // each column has 9 pads, 2^9 - 1 = 511
-  encoderConfig[`c${i}`] = ['int', digits]
+  // string instrument only has one active pad per column (or none)
+  encoderConfig[`string-column-${i}`] = [0, SOUNDS_COUNT, 1]
+
+  // piano instrument has 9 pads per column, any of which can be active
+  let j = SOUNDS_COUNT
+  while (j--) {
+    encoderConfig[`piano-col-row-${i}-${j}`] = [0, 1, 1]
+  }
 }
 
 const { encodeObject, decodeObject } = createEncoder(encoderConfig)
@@ -22,33 +23,28 @@ const { encodeObject, decodeObject } = createEncoder(encoderConfig)
 type ActivePad = { instrument: number; row: number; column: number }
 export function getActivePadsFromHash(encodedString: string): ActivePad[] {
   const activePads: ActivePad[] = []
-
   const settings = decodeObject(encodedString)
-  settings.stringsActive
-    .toString()
-    .split('')
-    .forEach((activeRowStr: string, column: number) => {
+
+  for (let key in settings) {
+    if (key.startsWith('string-column-')) {
+      const activeRow = settings[key]
       const instrument = 1
-      const activeRow = parseInt(activeRowStr, 10)
+      const column = parseInt(key.split('string-column-')[1], 10)
       if (activeRow) {
         const row = activeRow - 1
         activePads.push({ instrument, row, column })
       }
-    })
-
-  for (let j = 0; j < COLUMN_COUNT; j++) {
-    const bits = settings[`c${j}`].toString(2)
-    bits
-      .padStart(SOUNDS_COUNT, '0')
-      .split('')
-      .forEach((isActive: '0' | '1', k: number) => {
-        const instrument = 0
-        const column = j
-        if (isActive === '1') {
-          const row = k % SOUNDS_COUNT
-          activePads.push({ instrument, row, column })
-        }
-      })
+    }
+    if (key.startsWith('piano-col-row-')) {
+      const isActive = Boolean(settings[key])
+      const instrument = 0
+      if (isActive) {
+        const [c, r] = key.split('piano-col-row-')[1].split('-')
+        const column = parseInt(c, 10)
+        const row = parseInt(r, 10)
+        activePads.push({ instrument, row, column })
+      }
+    }
   }
 
   return activePads
@@ -59,20 +55,17 @@ export function generateHash(pads: boolean[][][]) {
   const pianoPads = pads[0]
   const stringPads = pads[1]
 
-  const stringsActive = stringPads
-    .map((col) => {
-      const activePad = col.find((isActive) => isActive)
-      return activePad ? col.indexOf(activePad) + 1 : 0
+  const settings: Record<string, number> = {}
+
+  stringPads.forEach((rows, colIdx) => {
+    const activePad = rows.findIndex((isActive) => isActive)
+    settings[`string-column-${colIdx}`] = activePad + 1
+  })
+
+  pianoPads.forEach((rows, colIdx) => {
+    rows.forEach((isActive, rowIdx) => {
+      settings[`piano-col-row-${colIdx}-${rowIdx}`] = isActive ? 1 : 0
     })
-    .join('')
-
-  const settings = {
-    stringsActive: stringsActive,
-  }
-
-  pianoPads.map((col, j) => {
-    const bits = col.map((isActive) => (isActive ? 1 : 0)).join('')
-    settings[`c${j}`] = parseInt(bits, 2)
   })
 
   return encodeObject(settings)

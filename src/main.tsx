@@ -13,12 +13,12 @@ if (!canPlayMP3 || canPlayMP3 === 'maybe') {
   throw new Error(msg)
 }
 
-// const { hash } = document.location
-// if (hash && hash.slice(0, 2) === '#/') {
-//   copland.loadFromHash(hash.slice(2))
-// }
-
 const copland = new Copland(instrumentConfig)
-const root = createRoot(document.querySelector('#app'))
 
+const { hash } = document.location
+if (hash && hash.slice(0, 2) === '#/') {
+  copland.loadFromHash(hash.slice(2))
+}
+
+const root = createRoot(document.querySelector('#app'))
 root.render(<App copland={copland} />)

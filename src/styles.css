@@ -123,39 +123,6 @@ h1.title {
   color: #fff;
 }
 
-#info h1 {
-  text-align: center;
-  margin-top: 0;
-}
-
-#info {
-  z-index: 10;
-  text-align: left;
-  padding: 30px 50px;
-  width: 400px;
-  /*height: 100%;*/
-  position: absolute;
-  top: 0;
-  left: -500px;
-  background-color: rgb(27, 34, 32);
-  -webkit-transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-  -moz-transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-  transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-  color: #eee;
-  font-weight: 300;
-  line-height: 1.5em;
-  letter-spacing: 0;
-  font-size: 0.95em;
-}
-
-#info.open {
-  left: 0;
-}
-
-#info a {
-  color: #eee;
-}
-
 .instrument {
   width: 320px;
   margin: 10px;
@@ -304,4 +271,40 @@ h1.title {
     background-color 2s linear,
     bottom 800ms cubic-bezier(0.4, 1, 0.32, 1) 200ms,
     width 200ms ease;
+}
+
+.opt-in {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 1000;
+  opacity: 1;
+  transition: opacity 200ms linear 200ms;
+}
+
+.opt-in button {
+  font-size: 2em;
+  padding: 15px 30px;
+  border: 1px solid #ddd;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  background-color: #fafafa;
+  color: #838383;
+  transition: all 200ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.opt-in button:hover {
+  background-color: #fff;
+  border-color: #ccc;
+}
+
+.opt-in.hide {
+  opacity: 0;
+  pointer-events: none;
 }

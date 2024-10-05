@@ -1,5 +1,5 @@
 import { Howl } from 'howler'
-// import { getActivePadsFromHash, generateHash } from './state-encoder'
+import { getActivePadsFromHash, generateHash } from './lib/state-encoder'
 
 export type InstrumentDefinition = {
   palettes: { src: string; sprite: { [key: string]: [number, number] } }[]
@@ -34,6 +34,7 @@ export default class Copland {
   readonly instruments: Instrument[]
 
   private onChangeCallbacks: (() => void)[] = []
+  private onReadyCallbacks: (() => void)[] = []
   // private evolveTimeout: ReturnType<typeof setTimeout> | null = null
   private tickTimeout: ReturnType<typeof setTimeout> | null = null
 
@@ -56,7 +57,7 @@ export default class Copland {
               if (isDone) {
                 this.ready = true
                 this.loading = false
-                this.togglePlaying()
+                this.onReadyCallbacks.forEach((callback) => callback())
               }
               this.triggerOnChange()
             },
@@ -66,9 +67,9 @@ export default class Copland {
     })
   }
 
-  triggerOnChange() {
+  triggerOnChange = throttle(() => {
     this.onChangeCallbacks.forEach((callback) => callback())
-  }
+  }, 1000 / 60)
 
   addOnChange(callback: () => void): () => void {
     this.onChangeCallbacks.push(callback)
@@ -77,15 +78,20 @@ export default class Copland {
     }
   }
 
-  togglePlaying() {
-    this.playing = !this.playing
+  addOnReady(callback: () => void): () => void {
+    this.onReadyCallbacks.push(callback)
+    return () => {
+      this.onReadyCallbacks = this.onReadyCallbacks.filter((c) => c !== callback)
+    }
+  }
+
+  togglePlaying(play?: boolean) {
+    this.playing = play ?? !this.playing
+    if (this.tickTimeout) clearTimeout(this.tickTimeout)
     if (this.playing) {
       this.tickTimeout = setTimeout(() => this.tick(), this.tempo)
     } else {
-      if (this.tickTimeout) {
-        clearTimeout(this.tickTimeout)
-        this.tickTimeout = null
-      }
+      this.tickTimeout = null
     }
   }
 
@@ -146,15 +152,26 @@ export default class Copland {
     this.triggerOnChange()
   }
 
-  // loadFromHash(hash: string) {
-  //   const activePads = getActivePadsFromHash(hash)
-  //   activePads.forEach(({ instrument, row, column }) => {
-  //     this.togglePad(instrument, column, row)
-  //   })
-  // }
+  loadFromHash(hash: string) {
+    const activePads = getActivePadsFromHash(hash)
+    activePads.forEach(({ instrument, row, column }) => {
+      this.togglePad(instrument, column, row)
+    })
+  }
 
-  // encodeState() {
-  //   const activePads = this.instruments.map((instrument) => instrument.pads)
-  //   return generateHash(activePads)
-  // }
+  encodeState() {
+    const activePads = this.instruments.map((instrument) => instrument.pads)
+    return generateHash(activePads)
+  }
+}
+
+function throttle(fn: () => void, wait: number) {
+  let timeout: ReturnType<typeof setTimeout> | null = null
+  return () => {
+    if (timeout) return
+    timeout = setTimeout(() => {
+      fn()
+      timeout = null
+    }, wait)
+  }
 }

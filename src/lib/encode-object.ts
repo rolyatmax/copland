@@ -1,10 +1,8 @@
-// @ts-nocheck
-
 import hashObject from 'object-hash'
 import { toBase62, fromBase62, toBase2, fromBase2 } from 'bases'
 
 export interface EncoderConfig {
-  [key: string]: [number, number, number]
+  [key: string]: [number, number, number] // [min, max, step] (min and max are inclusive)
 }
 
 export interface Encoder {
@@ -39,15 +37,11 @@ export default function createEncoder(config: EncoderConfig): Encoder {
 
   let totalBitsNeeded = 0
 
-  // fill in defaults
-  config = { ...config }
   configKeys.forEach((key) => {
     const [min, max, step = 1] = config[key]
     if (step === 0) throw new RangeError(`step cannot be 0 for field: ${key}`)
-    const steps = (max - min) / step + 1 // plus one because range is inclusive
-    const bitsNeeded = Math.max(1, Math.ceil(Math.log2(steps))) // requires at least 1 bit
+    const bitsNeeded = getBitsNeeded(min, max, step)
     totalBitsNeeded += bitsNeeded
-    config[key] = [min, max, step, bitsNeeded]
   })
 
   const base2HashLength = Math.ceil(totalBitsNeeded / base2ChunkSize) * base2ChunkSize
@@ -60,7 +54,7 @@ export default function createEncoder(config: EncoderConfig): Encoder {
     __ALGORITHM_VERSION__: ALGO_VERSION,
   }).slice(0, VERSION_LENGTH)
 
-  function validateObject(obj) {
+  function validateObject(obj: Record<string, number>) {
     const objKeys = Object.keys(obj)
     const missingConfigKeys = objKeys.filter((key) => !configKeys.includes(key))
     const missingObjKeys = configKeys.filter((key) => !objKeys.includes(key))
@@ -95,18 +89,19 @@ export default function createEncoder(config: EncoderConfig): Encoder {
     })
   }
 
-  function validateHash(hash) {
+  function validateHash(hash: string) {
     const version = hash.slice(0, VERSION_LENGTH)
     if (version !== configVersion) {
       throw new Error('hash was encoded with different config version')
     }
   }
 
-  function encodeObject(obj) {
+  function encodeObject(obj: Record<string, number>): string {
     validateObject(obj)
     let bits = configKeys
       .map((key) => {
-        const [min, , step, bitsNeeded] = config[key]
+        const [min, max, step] = config[key]
+        const bitsNeeded = getBitsNeeded(min, max, step)
         const val = obj[key]
         // NOTE: rounding here because of floating point errors?
         const valInBase2 = toBase2(Math.round((val - min) / step))
@@ -126,7 +121,7 @@ export default function createEncoder(config: EncoderConfig): Encoder {
     return configVersion + hash
   }
 
-  function decodeObject(hash) {
+  function decodeObject(hash: string): Record<string, number> {
     const obj = {}
     validateHash(hash)
     hash = hash.slice(VERSION_LENGTH)
@@ -140,7 +135,8 @@ export default function createEncoder(config: EncoderConfig): Encoder {
     const extraBits = bits.length - totalBitsNeeded
     bits = extraBits ? bits.slice(extraBits) : bits.padStart(totalBitsNeeded, '0')
     configKeys.forEach((key) => {
-      const [min, , step, bitsNeeded] = config[key]
+      const [min, max, step] = config[key]
+      const bitsNeeded = getBitsNeeded(min, max, step)
       const bit = bits.slice(0, bitsNeeded)
       const val = fromBase2(bit)
       obj[key] = val * step + min
@@ -150,4 +146,10 @@ export default function createEncoder(config: EncoderConfig): Encoder {
   }
 
   return { decodeObject, encodeObject }
+}
+
+function getBitsNeeded(min: number, max: number, step: number): number {
+  const steps = (max - min) / step + 1 // plus one because range is inclusive
+  const bitsNeeded = Math.max(1, Math.ceil(Math.log2(steps))) // requires at least 1 bit
+  return bitsNeeded
 }
