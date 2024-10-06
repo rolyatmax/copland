@@ -1,6 +1,6 @@
 # copland
 
-See it in action at [http://tbaldw.in/copland](http://tbaldw.in/copland).
+See it in action at [https://tbaldw.in/copland](http://tbaldw.in/copland).
 
 ![copland](/public/images/1.png?raw=true 'copland')
 
