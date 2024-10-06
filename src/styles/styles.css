@@ -190,28 +190,49 @@ h1.title {
   text-transform: uppercase;
 }
 
+.saved-popup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
 .saved-popup {
   font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
   color: #555;
   opacity: 0;
-  width: 300px;
   position: absolute;
   top: -500px;
-  left: 50%;
-  margin-left: -150px;
   background-color: white;
-  padding: 20px 30px;
+  padding: 30px 50px;
   border: 1px solid #eee;
   box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.3);
   transition:
     top 1s cubic-bezier(0.23, 1, 0.32, 1),
     opacity 0.4s linear;
-  -webkit-transition:
-    top 1s cubic-bezier(0.23, 1, 0.32, 1),
-    opacity 0.4s linear;
-  -moz-transition:
-    top 1s cubic-bezier(0.23, 1, 0.32, 1),
-    opacity 0.4s linear;
+}
+
+.saved-popup code {
+  font-family: monospace;
+  font-size: 1.2em;
+  color: #444;
+  background-color: #fafafa;
+  display: inline-block;
+  padding: 7px 10px;
+  border: 1px solid #eee;
+  border-radius: 5px;
+}
+
+.saved-popup button {
+  font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+  font-size: 1em;
+  color: #444;
+  background-color: #fafafa;
+  display: block;
+  margin-top: 10px;
+  padding: 5px 8px;
+  border: 1px solid #eee;
+  border-radius: 5px;
 }
 
 .saved-popup .close {

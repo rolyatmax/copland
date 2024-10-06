@@ -30,7 +30,7 @@ export default class Copland {
   ready = false
   loading = false
   playing = false
-  evolving = true
+  evolving = false
   readonly filesToLoad: number
   filesLoaded = 0
   currentTick = -1
@@ -60,6 +60,7 @@ export default class Copland {
               if (isDone) {
                 this.ready = true
                 this.loading = false
+                this.toggleEvolving(true)
                 this.onReadyCallbacks.forEach((callback) => callback())
               }
               this.triggerOnChange()
