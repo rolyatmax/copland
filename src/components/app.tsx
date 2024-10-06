@@ -78,6 +78,12 @@ export default function App({ copland }: { copland: Copland }) {
             ) : null}
             {copland.ready ? (
               <div className="btns">
+                <div
+                  onClick={() => (window.location.href = 'https://github.com/rolyatmax/copland')}
+                  className="open-info"
+                >
+                  info
+                </div>
                 <div onClick={() => setShowSave(true)} className="save-btn">
                   save
                 </div>
