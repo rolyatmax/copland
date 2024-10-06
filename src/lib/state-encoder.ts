@@ -1,5 +1,6 @@
 import createEncoder from './encode-object'
 import type { EncoderConfig } from './encode-object'
+import type { TogglePadAction } from '../copland'
 
 const SOUNDS_COUNT = 9
 const COLUMN_COUNT = 8
@@ -20,9 +21,8 @@ while (i--) {
 
 const { encodeObject, decodeObject } = createEncoder(encoderConfig)
 
-type ActivePad = { instrument: number; row: number; column: number }
-export function getActivePadsFromHash(encodedString: string): ActivePad[] {
-  const activePads: ActivePad[] = []
+export function getActivePadsFromHash(encodedString: string): TogglePadAction[] {
+  const activePads: TogglePadAction[] = []
   const settings = decodeObject(encodedString)
 
   for (let key in settings) {
@@ -32,7 +32,7 @@ export function getActivePadsFromHash(encodedString: string): ActivePad[] {
       const column = parseInt(key.split('string-column-')[1], 10)
       if (activeRow) {
         const row = activeRow - 1
-        activePads.push({ instrument, row, column })
+        activePads.push({ instrument, row, column, active: true })
       }
     }
     if (key.startsWith('piano-col-row-')) {
@@ -42,7 +42,7 @@ export function getActivePadsFromHash(encodedString: string): ActivePad[] {
         const [c, r] = key.split('piano-col-row-')[1].split('-')
         const column = parseInt(c, 10)
         const row = parseInt(r, 10)
-        activePads.push({ instrument, row, column })
+        activePads.push({ instrument, row, column, active: true })
       }
     }
   }

@@ -25,7 +25,7 @@ export default function App({ copland }: { copland: Copland }) {
     (e: KeyboardEvent) => {
       const keyBindings: Record<string, () => void> = {
         Backspace: copland.clearAllPads.bind(copland),
-        // KeyE: copland.toggleEvolving.bind(copland),
+        KeyE: copland.toggleEvolving.bind(copland),
         KeyS: () => setShowSave((show: boolean) => !show),
         Space: copland.togglePlaying.bind(copland),
         Enter: copland.togglePlaying.bind(copland),
@@ -81,10 +81,12 @@ export default function App({ copland }: { copland: Copland }) {
                 <div onClick={() => setShowSave(true)} className="save-btn">
                   save
                 </div>
-                {/** TODO: TURN THIS BACK ON ONCE EVOLVE IS SET UP  */}
-                {/* <div onClick={toggleEvolving} className={`evolve-btn ${evolving ? 'evolving' : ''}`}>
+                <div
+                  onClick={() => copland.toggleEvolving()}
+                  className={`evolve-btn ${copland.evolving ? 'evolving' : ''}`}
+                >
                   evolve
-                </div> */}
+                </div>
               </div>
             ) : null}
           </div>

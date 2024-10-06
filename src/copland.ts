@@ -1,5 +1,6 @@
 import { Howl } from 'howler'
 import { getActivePadsFromHash, generateHash } from './lib/state-encoder'
+import { sample, getRowAndColumn, getMostFilledCol, getMostFilledRow } from './lib/evolve-utils'
 
 export type InstrumentDefinition = {
   palettes: { src: string; sprite: { [key: string]: [number, number] } }[]
@@ -21,13 +22,15 @@ type Instrument = {
   pads: boolean[][]
 }
 
+export type TogglePadAction = { instrument: number; row: number; column: number; active?: boolean }
+
 export default class Copland {
   readonly tempo = 350
   readonly evolveSpeed = 2000
   ready = false
   loading = false
   playing = false
-  evolving = false
+  evolving = true
   readonly filesToLoad: number
   filesLoaded = 0
   currentTick = -1
@@ -35,7 +38,7 @@ export default class Copland {
 
   private onChangeCallbacks: (() => void)[] = []
   private onReadyCallbacks: (() => void)[] = []
-  // private evolveTimeout: ReturnType<typeof setTimeout> | null = null
+  private evolveTimeout: ReturnType<typeof setTimeout> | null = null
   private tickTimeout: ReturnType<typeof setTimeout> | null = null
 
   constructor(instruments: InstrumentDefinition[]) {
@@ -95,18 +98,15 @@ export default class Copland {
     }
   }
 
-  // TODO: IMPLEMENT EVOLVE LOOP
-  // toggleEvolving() {
-  //   this.evolving = !this.evolving
-  //   if (this.evolving) {
-  //     this.evolveTimeout = setTimeout(() => this.evolve(), this.evolveSpeed)
-  //   } else {
-  //     if (this.evolveTimeout) {
-  //       clearTimeout(this.evolveTimeout)
-  //       this.evolveTimeout = null
-  //     }
-  //   }
-  // }
+  toggleEvolving(evolve?: boolean) {
+    this.evolving = evolve ?? !this.evolving
+    if (this.evolveTimeout) clearTimeout(this.evolveTimeout)
+    if (this.evolving) {
+      this.evolveTimeout = setTimeout(() => this.evolve(), this.evolveSpeed)
+    } else {
+      this.evolveTimeout = null
+    }
+  }
 
   clearAllPads() {
     this.instruments.forEach((instrument) => {
@@ -115,16 +115,17 @@ export default class Copland {
     this.triggerOnChange()
   }
 
-  togglePad(instrument: number, column: number, row: number) {
+  togglePad(instrument: number, column: number, row: number, active?: boolean) {
     const curInstrument = this.instruments[instrument]
     const curColumn = curInstrument.pads[column]
     const isLimited = curInstrument.limit
     if (isLimited) {
       for (let i = 0; i < curColumn.length; i++) {
+        if (i === row) continue
         curColumn[i] = false
       }
     }
-    curColumn[row] = !curColumn[row]
+    curColumn[row] = active ?? !curColumn[row]
     this.triggerOnChange()
   }
 
@@ -172,10 +173,53 @@ export default class Copland {
     this.triggerOnChange()
   }
 
+  evolve() {
+    this.evolveTimeout = setTimeout(() => this.evolve(), this.evolveSpeed)
+    this.instruments
+      .filter((instr) => instr.evolve && Math.random() < 0.5)
+      .forEach((instrument, i) => {
+        const { measureLength, sounds, pads } = instrument
+
+        // Collect some stats on the whole grid, and each row/column
+        const totalPads = sounds * measureLength
+        const activePads = getRowAndColumn(true, pads)
+        const inactivePads = getRowAndColumn(false, pads)
+        const percFilled = activePads.length / totalPads
+        const mostFilledCol = getMostFilledCol(pads)
+        const mostFilledRow = getMostFilledRow(pads)
+
+        // string instruments should never toggle off
+        const makeActive = i === 1 ? true : undefined
+
+        if (mostFilledCol.length > 2) {
+          const pad = sample(mostFilledCol)
+          this.togglePad(i, pad.column, pad.row, makeActive)
+        } else if (mostFilledRow.length > 2) {
+          const pad = sample(mostFilledRow)
+          this.togglePad(i, pad.column, pad.row, makeActive)
+        } else if (percFilled > 0.38) {
+          const pad = sample(activePads)
+          this.togglePad(i, pad.column, pad.row, makeActive)
+        } else if (percFilled < 0.29) {
+          const pad = sample(inactivePads)
+          this.togglePad(i, pad.column, pad.row, makeActive)
+        } else {
+          const pad1 = sample(activePads)
+          this.togglePad(i, pad1.column, pad1.row, makeActive)
+          const pad2 = sample(inactivePads)
+          this.togglePad(i, pad2.column, pad2.row, makeActive)
+        }
+
+        if (Math.random() < 0.15) {
+          this.nextSoundPalette()
+        }
+      })
+  }
+
   loadFromHash(hash: string) {
     const activePads = getActivePadsFromHash(hash)
-    activePads.forEach(({ instrument, row, column }) => {
-      this.togglePad(instrument, column, row)
+    activePads.forEach(({ instrument, row, column, active }) => {
+      this.togglePad(instrument, column, row, active)
     })
   }
 
