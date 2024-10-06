@@ -1,12 +1,12 @@
 import { InstrumentDefinition } from './copland'
 
 const audioFiles = [
-  '/audio/morning_sprite.mp3',
-  '/audio/morning_sprite2.mp3',
-  '/audio/morning_sprite4.mp3',
-  '/audio/morning_sprite5.mp3',
-  '/audio/morning_sprite7.mp3',
-  '/audio/morning_sprite9.mp3',
+  'audio/morning_sprite.mp3',
+  'audio/morning_sprite2.mp3',
+  'audio/morning_sprite4.mp3',
+  'audio/morning_sprite5.mp3',
+  'audio/morning_sprite7.mp3',
+  'audio/morning_sprite9.mp3',
 ]
 
 const instrumentConfig: InstrumentDefinition[] = [

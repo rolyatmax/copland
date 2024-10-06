@@ -1,5 +1,5 @@
 import type { UserConfig } from 'vite'
 
 export default {
-  // root: 'src',
+  base: '/copland/',
 } satisfies UserConfig
