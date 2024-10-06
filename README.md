@@ -1,7 +1,7 @@
 copland
 =======
 
-Check out [this loop](https://tbaldw.in/copland/#/b924824000w08000k0a10PIwe) I made. Click around a bit and make it your own!
+See it in action at [http://tbaldw.in/copland](http://tbaldw.in/copland).
 
 ![copland](/images/1.png?raw=true "copland")
 
@@ -13,11 +13,6 @@ You can leave Copland running in the background but it generally performs better
 
 Users may also save their creations by pressing the letter 's'. This will pull up a URL which should load in the creation at the start.
 
-The name "Copland" comes from the famous American composer Aaron Copland, whose Pulitzer prize-winning work, "Appalachian Spring" inspired the sound palette.
+The name "Copland" comes from the American composer Aaron Copland, whose Pulitzer prize-winning work, "Appalachian Spring" inspired the sound palette.
 
-There are still a few little bugs and additions that need to be made. And reporting bugs is much appreciated!
-
-Also: I only have mp3 files for the project right now - which means it won't work in Firefox. Try Chrome or Safari instead.
-
-See it in action at [http://tbaldw.in/copland](http://tbaldw.in/copland).
-And check out the code on my GitHub profile: [http://github.com/rolyatmax/copland](http://github.com/rolyatmax/copland).
+There are still a few issues here and there. And reporting bugs is much appreciated!
