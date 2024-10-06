@@ -1,9 +1,8 @@
-copland
-=======
+# copland
 
 See it in action at [http://tbaldw.in/copland](http://tbaldw.in/copland).
 
-![copland](/images/1.png?raw=true "copland")
+![copland](/public/images/1.png?raw=true 'copland')
 
 This little music-making experiment encourages the user to create patterns by clicking boxes which represent different pre-determined pitches. The piano sounds of the grid on the left move 16x faster than the string sounds of the grid on the right. The string harmonies were selected to sound more-or-less consonant with the pitch palette of the piano grid. Clicking the colored box results in a shift to a new pitch palette for both grids.
 

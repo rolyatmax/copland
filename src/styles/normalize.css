@@ -18,7 +18,7 @@ header,
 hgroup,
 nav,
 section {
-    display: block;
+  display: block;
 }
 
 /*
@@ -28,9 +28,9 @@ section {
 audio,
 canvas,
 video {
-    display: inline-block;
-    *display: inline;
-    *zoom: 1;
+  display: inline-block;
+  display: inline;
+  zoom: 1;
 }
 
 /*
@@ -38,7 +38,7 @@ video {
  */
 
 audio:not([controls]) {
-    display: none;
+  display: none;
 }
 
 /*
@@ -47,9 +47,8 @@ audio:not([controls]) {
  */
 
 [hidden] {
-    display: none;
+  display: none;
 }
-
 
 /* =============================================================================
    Base
@@ -64,10 +63,10 @@ audio:not([controls]) {
  */
 
 html {
-    font-size: 100%; /* 1 */
-    overflow-y: scroll; /* 2 */
-    -webkit-text-size-adjust: 100%; /* 3 */
-    -ms-text-size-adjust: 100%; /* 3 */
+  font-size: 100%; /* 1 */
+  overflow-y: scroll; /* 2 */
+  -webkit-text-size-adjust: 100%; /* 3 */
+  -ms-text-size-adjust: 100%; /* 3 */
 }
 
 /*
@@ -75,10 +74,10 @@ html {
  */
 
 body {
-    margin: 0;
+  margin: 0;
 }
 
-/* 
+/*
  * Addresses font-family inconsistency between 'textarea' and other form elements.
  */
 
@@ -87,20 +86,19 @@ button,
 input,
 select,
 textarea {
-    font-family: sans-serif;
+  font-family: sans-serif;
 }
-
 
 /* =============================================================================
    Links
    ========================================================================== */
 
 a {
-    color: #00e;
+  color: #00e;
 }
 
 a:visited {
-    color: #551a8b;
+  color: #551a8b;
 }
 
 /*
@@ -108,7 +106,7 @@ a:visited {
  */
 
 a:focus {
-    outline: thin dotted;
+  outline: thin dotted;
 }
 
 /*
@@ -118,9 +116,8 @@ a:focus {
 
 a:hover,
 a:active {
-    outline: 0;
+  outline: 0;
 }
-
 
 /* =============================================================================
    Typography
@@ -131,20 +128,20 @@ a:active {
  */
 
 abbr[title] {
-    border-bottom: 1px dotted;
+  border-bottom: 1px dotted;
 }
 
 /*
  * Addresses style set to 'bolder' in FF3/4, S4/5, Chrome
 */
 
-b, 
-strong { 
-    font-weight: bold; 
+b,
+strong {
+  font-weight: bold;
 }
 
 blockquote {
-    margin: 1em 40px;
+  margin: 1em 40px;
 }
 
 /*
@@ -152,7 +149,7 @@ blockquote {
  */
 
 dfn {
-    font-style: italic;
+  font-style: italic;
 }
 
 /*
@@ -160,8 +157,8 @@ dfn {
  */
 
 mark {
-    background: #ff0;
-    color: #000;
+  background: #ff0;
+  color: #000;
 }
 
 /*
@@ -173,9 +170,9 @@ pre,
 code,
 kbd,
 samp {
-    font-family: monospace, serif;
-    _font-family: 'courier new', monospace;
-    font-size: 1em;
+  font-family: monospace, serif;
+  _font-family: 'courier new', monospace;
+  font-size: 1em;
 }
 
 /*
@@ -183,9 +180,9 @@ samp {
  */
 
 pre {
-    white-space: pre;
-    white-space: pre-wrap;
-    word-wrap: break-word;
+  white-space: pre;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 /*
@@ -196,19 +193,19 @@ pre {
 /* 1 */
 
 q {
-    quotes: none;
+  quotes: none;
 }
 
 /* 2 */
 
 q:before,
 q:after {
-    content: '';
-    content: none;
+  content: '';
+  content: none;
 }
 
 small {
-    font-size: 75%;
+  font-size: 75%;
 }
 
 /*
@@ -218,20 +215,19 @@ small {
 
 sub,
 sup {
-    font-size: 75%;
-    line-height: 0;
-    position: relative;
-    vertical-align: baseline;
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
 }
 
 sup {
-    top: -0.5em;
+  top: -0.5em;
 }
 
 sub {
-    bottom: -0.25em;
+  bottom: -0.25em;
 }
-
 
 /* =============================================================================
    Lists
@@ -239,20 +235,19 @@ sub {
 
 ul,
 ol {
-    margin: 1em 0;
-    padding: 0 0 0 40px;
+  margin: 1em 0;
+  padding: 0 0 0 40px;
 }
 
 dd {
-    margin: 0 0 0 40px;
+  margin: 0 0 0 40px;
 }
 
 nav ul,
 nav ol {
-    list-style: none;
-    list-style-image: none;
+  list-style: none;
+  list-style-image: none;
 }
-
 
 /* =============================================================================
    Embedded content
@@ -265,18 +260,17 @@ nav ol {
  */
 
 img {
-    border: 0; /* 1 */
-    -ms-interpolation-mode: bicubic; /* 2 */
+  border: 0; /* 1 */
+  -ms-interpolation-mode: bicubic; /* 2 */
 }
 
 /*
- * Corrects overflow displayed oddly in IE9 
+ * Corrects overflow displayed oddly in IE9
  */
 
 svg:not(:root) {
-    overflow: hidden;
+  overflow: hidden;
 }
-
 
 /* =============================================================================
    Figures
@@ -287,9 +281,8 @@ svg:not(:root) {
  */
 
 figure {
-    margin: 0;
+  margin: 0;
 }
-
 
 /* =============================================================================
    Forms
@@ -300,7 +293,7 @@ figure {
  */
 
 form {
-    margin: 0;
+  margin: 0;
 }
 
 /*
@@ -308,9 +301,9 @@ form {
  */
 
 fieldset {
-    border: 1px solid #c0c0c0;
-    margin: 0 2px;
-    padding: 0.35em 0.625em 0.75em;
+  border: 1px solid #c0c0c0;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em;
 }
 
 /*
@@ -319,8 +312,8 @@ fieldset {
  */
 
 legend {
-    border: 0; /* 1 */
-    *margin-left: -7px; /* 2 */
+  border: 0; /* 1 */
+  margin-left: -7px; /* 2 */
 }
 
 /*
@@ -333,10 +326,10 @@ button,
 input,
 select,
 textarea {
-    font-size: 100%; /* 1 */
-    margin: 0; /* 2 */
-    vertical-align: baseline; /* 3 */
-    *vertical-align: middle; /* 3 */
+  font-size: 100%; /* 1 */
+  margin: 0; /* 2 */
+  vertical-align: baseline; /* 3 */
+  vertical-align: middle; /* 3 */
 }
 
 /*
@@ -345,7 +338,7 @@ textarea {
 
 button,
 input {
-    line-height: normal; /* 1 */
+  line-height: normal; /* 1 */
 }
 
 /*
@@ -356,12 +349,12 @@ input {
  */
 
 button,
-input[type="button"], 
-input[type="reset"], 
-input[type="submit"] {
-    cursor: pointer; /* 1 */
-    -webkit-appearance: button; /* 2 */
-    *overflow: visible;  /* 3 */
+input[type='button'],
+input[type='reset'],
+input[type='submit'] {
+  cursor: pointer; /* 1 */
+  -webkit-appearance: button; /* 2 */
+  overflow: visible; /* 3 */
 }
 
 /*
@@ -369,10 +362,10 @@ input[type="submit"] {
  * 2. Addresses excess padding in IE8/9
  */
 
-input[type="checkbox"],
-input[type="radio"] {
-    box-sizing: border-box; /* 1 */
-    padding: 0; /* 2 */
+input[type='checkbox'],
+input[type='radio'] {
+  box-sizing: border-box; /* 1 */
+  padding: 0; /* 2 */
 }
 
 /*
@@ -380,19 +373,19 @@ input[type="radio"] {
  * 2. Addresses box sizing set to border-box in S5, Chrome (include -moz to future-proof)
  */
 
-input[type="search"] {
-    -webkit-appearance: textfield; /* 1 */
-    -moz-box-sizing: content-box;
-    -webkit-box-sizing: content-box; /* 2 */
-    box-sizing: content-box;
+input[type='search'] {
+  -webkit-appearance: textfield; /* 1 */
+  -moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box; /* 2 */
+  box-sizing: content-box;
 }
 
 /*
  * Corrects inner padding displayed oddly in S5, Chrome on OSX
  */
 
-input[type="search"]::-webkit-search-decoration {
-    -webkit-appearance: none;
+input[type='search']::-webkit-search-decoration {
+  -webkit-appearance: none;
 }
 
 /*
@@ -402,8 +395,8 @@ input[type="search"]::-webkit-search-decoration {
 
 button::-moz-focus-inner,
 input::-moz-focus-inner {
-    border: 0;
-    padding: 0;
+  border: 0;
+  padding: 0;
 }
 
 /*
@@ -412,20 +405,19 @@ input::-moz-focus-inner {
  */
 
 textarea {
-    overflow: auto; /* 1 */
-    vertical-align: top; /* 2 */
+  overflow: auto; /* 1 */
+  vertical-align: top; /* 2 */
 }
-
 
 /* =============================================================================
    Tables
    ========================================================================== */
 
-/* 
+/*
  * Remove most spacing between table cells
  */
 
 table {
-    border-collapse: collapse;
-    border-spacing: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
 }
