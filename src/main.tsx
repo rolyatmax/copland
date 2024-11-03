@@ -1,6 +1,8 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import App from './components/app.tsx'
+import { createRenderer } from './renderer.ts'
+import Buttons from './components/buttons.tsx'
+import Intro from './components/intro.tsx'
 import Copland from './copland'
 import instrumentConfig from './instrument-config'
 import './styles/normalize.css'
@@ -14,6 +16,7 @@ if (!canPlayMP3 || canPlayMP3 === 'maybe') {
 }
 
 const copland = new Copland(instrumentConfig)
+const renderer = await createRenderer(document.querySelector('canvas')!, copland)
 
 const { hash } = document.location
 if (hash && hash.slice(0, 2) === '#/') {
@@ -22,5 +25,13 @@ if (hash && hash.slice(0, 2) === '#/') {
   copland.randomizePads()
 }
 
-const root = createRoot(document.querySelector('#app'))
-root.render(<App copland={copland} />)
+copland.addOnReady(() => {
+  document.querySelector('#app')!.classList.add('show')
+  renderer.start()
+})
+
+const introRoot = createRoot(document.querySelector('#intro'))
+introRoot.render(<Intro copland={copland} />)
+
+const buttonsRoot = createRoot(document.querySelector('#btns'))
+buttonsRoot.render(<Buttons copland={copland} />)

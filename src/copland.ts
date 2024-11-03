@@ -11,7 +11,7 @@ export type InstrumentDefinition = {
   evolve: boolean
 }
 
-type Instrument = {
+export type Instrument = {
   palettes: Howl[]
   sounds: number
   measureLength: number
@@ -38,6 +38,8 @@ export default class Copland {
 
   private onChangeCallbacks: (() => void)[] = []
   private onReadyCallbacks: (() => void)[] = []
+  private onToggleCallbacks: ((action: TogglePadAction) => void)[] = []
+  private onTickCallbacks: ((columns: { instrument: number; column: number }[]) => void)[] = []
   private evolveTimeout: ReturnType<typeof setTimeout> | null = null
   private tickTimeout: ReturnType<typeof setTimeout> | null = null
 
@@ -89,6 +91,20 @@ export default class Copland {
     }
   }
 
+  addOnToggle(callback: (action: TogglePadAction) => void): () => void {
+    this.onToggleCallbacks.push(callback)
+    return () => {
+      this.onToggleCallbacks = this.onToggleCallbacks.filter((c) => c !== callback)
+    }
+  }
+
+  addOnTick(callback: (columns: { instrument: number; column: number }[]) => void): () => void {
+    this.onTickCallbacks.push(callback)
+    return () => {
+      this.onTickCallbacks = this.onTickCallbacks.filter((c) => c !== callback)
+    }
+  }
+
   togglePlaying(play?: boolean) {
     this.playing = play ?? !this.playing
     if (this.tickTimeout) clearTimeout(this.tickTimeout)
@@ -110,10 +126,15 @@ export default class Copland {
   }
 
   clearAllPads() {
-    this.instruments.forEach((instrument) => {
-      instrument.pads.forEach((column) => column.fill(false))
+    this.instruments.forEach((instrument, i) => {
+      instrument.pads.forEach((column, j) => {
+        column.forEach((active, k) => {
+          if (active) {
+            this.togglePad(i, j, k, false)
+          }
+        })
+      })
     })
-    this.triggerOnChange()
   }
 
   togglePad(instrument: number, column: number, row: number, active?: boolean) {
@@ -123,10 +144,18 @@ export default class Copland {
     if (isLimited) {
       for (let i = 0; i < curColumn.length; i++) {
         if (i === row) continue
-        curColumn[i] = false
+        if (curColumn[i]) {
+          curColumn[i] = false
+          this.onToggleCallbacks.forEach((callback) =>
+            callback({ instrument, column, row: i, active: false }),
+          )
+        }
       }
     }
     curColumn[row] = active ?? !curColumn[row]
+    this.onToggleCallbacks.forEach((callback) =>
+      callback({ instrument, column, row, active: curColumn[row] }),
+    )
     this.triggerOnChange()
   }
 
@@ -158,20 +187,25 @@ export default class Copland {
   tick() {
     this.tickTimeout = setTimeout(() => this.tick(), this.tempo)
     this.currentTick++
-    this.instruments
+    const columns: { instrument: number; column: number }[] = this.instruments
       .filter((instrument) => this.currentTick % instrument.duration === 0)
-      .forEach((instrument) => {
-        const { palettes, soundPalette, pads, measureLength } = instrument
+      .map((instrument, instIdx) => {
+        const { measureLength } = instrument
         const curColumn = (this.currentTick / instrument.duration) % measureLength
-        const activePadsCount = pads[curColumn].filter(Boolean).length
-        pads[curColumn].forEach((isActive, i) => {
-          if (isActive) {
-            palettes[soundPalette].volume(1 / Math.pow(activePadsCount, 0.2))
-            palettes[soundPalette].play(String(i + 1)) // pitches are 1-indexed
-          }
-        })
+        return { instrument: instIdx, column: curColumn }
       })
+    columns.forEach(({ instrument, column }) => {
+      const { palettes, soundPalette, pads } = this.instruments[instrument]
+      const activePadsCount = pads[column].filter(Boolean).length
+      pads[column].forEach((isActive, i) => {
+        if (isActive) {
+          palettes[soundPalette].volume(1 / Math.pow(activePadsCount, 0.2))
+          palettes[soundPalette].play(String(i + 1)) // pitches are 1-indexed
+        }
+      })
+    })
     this.triggerOnChange()
+    this.onTickCallbacks.forEach((callback) => callback(columns))
   }
 
   evolve() {
