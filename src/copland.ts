@@ -40,6 +40,7 @@ export default class Copland {
   private onReadyCallbacks: (() => void)[] = []
   private onToggleCallbacks: ((action: TogglePadAction) => void)[] = []
   private onTickCallbacks: ((columns: { instrument: number; column: number }[]) => void)[] = []
+  private onPaletteChangeCallbacks: (() => void)[] = []
   private evolveTimeout: ReturnType<typeof setTimeout> | null = null
   private tickTimeout: ReturnType<typeof setTimeout> | null = null
 
@@ -102,6 +103,13 @@ export default class Copland {
     this.onTickCallbacks.push(callback)
     return () => {
       this.onTickCallbacks = this.onTickCallbacks.filter((c) => c !== callback)
+    }
+  }
+
+  addOnPaletteChange(callback: () => void): () => void {
+    this.onPaletteChangeCallbacks.push(callback)
+    return () => {
+      this.onPaletteChangeCallbacks = this.onPaletteChangeCallbacks.filter((c) => c !== callback)
     }
   }
 
@@ -181,6 +189,7 @@ export default class Copland {
     this.instruments.forEach((instrument) => {
       instrument.soundPalette = (instrument.soundPalette + 1) % instrument.palettes.length
     })
+    this.onPaletteChangeCallbacks.forEach((callback) => callback())
     this.triggerOnChange()
   }
 

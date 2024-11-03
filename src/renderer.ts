@@ -1,4 +1,3 @@
-import type { Instrument } from './copland'
 import * as random from 'canvas-sketch-util/random'
 import { setupWebGPU, createGPUBuffer } from './lib/webgpu'
 import { COLORS, WHITE } from './constants'
@@ -24,12 +23,16 @@ type CellRenderState = {
   position: ReturnType<typeof createSpring<[number, number]>>
 }
 
+type HoveredCell =
+  | { instrumentIdx: number; measureIdx: number; soundIdx: number }
+  | { paletteSelector: true }
+
 export async function createRenderer(canvas: HTMLCanvasElement, copland: Copland) {
   const instruments = copland.instruments
   const { device, context } = await setupWebGPU(canvas)
 
   let mouseXY: [number, number] | null = null
-  let hoveredCell: { instrumentIdx: number; measureIdx: number; soundIdx: number } | null = null
+  let hoveredCell: HoveredCell | null = null
 
   const canvasRect = canvas.getBoundingClientRect()
   canvas.addEventListener('mousemove', (e) => {
@@ -51,11 +54,44 @@ export async function createRenderer(canvas: HTMLCanvasElement, copland: Copland
 
   canvas.addEventListener('click', () => {
     if (!mouseXY || !hoveredCell) return
-    copland.togglePad(hoveredCell.instrumentIdx, hoveredCell.measureIdx, hoveredCell.soundIdx)
+    if ('paletteSelector' in hoveredCell) {
+      copland.nextSoundPalette()
+    } else {
+      copland.togglePad(hoveredCell.instrumentIdx, hoveredCell.measureIdx, hoveredCell.soundIdx)
+    }
   })
 
   // Map of `{instIdx}-{measureIdx}-{soundIdx}` to cell render state
   const cellRenderStateMap = new Map<string, CellRenderState>()
+
+  // palette selector cell key
+  const paletteSelectorKey = 'palette-selector'
+  cellRenderStateMap.set(paletteSelectorKey, {
+    size: createSpring<[number, number]>(
+      settings.springStiffness,
+      settings.springDampening,
+      [1, 1],
+      settings.springPrecision,
+    ),
+    color: createSpring<[number, number, number]>(
+      settings.springStiffness,
+      settings.springDampening,
+      COLORS[0],
+      settings.springPrecision,
+    ),
+    opacity: createSpring<number>(
+      settings.springStiffness,
+      settings.springDampening,
+      0.9,
+      settings.springPrecision,
+    ),
+    position: createSpring<[number, number]>(
+      settings.springStiffness,
+      settings.springDampening,
+      [Math.random() * canvas.width, Math.random() * canvas.height],
+      settings.springPrecision,
+    ),
+  })
 
   for (let instIdx = 0; instIdx < instruments.length; instIdx++) {
     const instrument = instruments[instIdx]
@@ -179,8 +215,8 @@ export async function createRenderer(canvas: HTMLCanvasElement, copland: Copland
     let mainColor = vec4f(color.rgb, color.a * (0.75 + 0.25 * rand.y));
 
     // Define outline parameters
-    let outlineWidth = 0.03;
-    let outlineStart = 1.0 - outlineWidth;
+    let outlineWidth = 0.08;
+    let outlineStart = 1.0 - outlineWidth / 2;
     let outlineColor = vec4f(0.1, 0.1, 0.1, 0.45 + rand.x * 0.25);
 
     let squircleK = uniforms.squircleK; // - size.x * 0.5;
@@ -189,10 +225,10 @@ export async function createRenderer(canvas: HTMLCanvasElement, copland: Copland
     let mainT = squircle(uv / size.x, squircleK);
     let mainWeight = smoothstep(1.0 - 0.05, 1.0, mainT);
 
-    // Calculate the outline weight - no longer multiplied by size.x
+    // Calculate the outline weight
     let outlineT = squircle(uv, squircleK);
-    let outlineWeight = smoothstep(outlineStart - 0.02, outlineStart, outlineT) *
-                      (1.0 - smoothstep(outlineStart, outlineStart + 0.02, outlineT));
+    let outlineWeight = smoothstep(outlineStart - outlineWidth / 2, outlineStart, outlineT) *
+                      (1.0 - smoothstep(outlineStart, outlineStart + outlineWidth / 2, outlineT));
 
     // Combine main shape and outline
     let mainShape = mix(vec4f(1.0, 1.0, 1.0, 0.0), mainColor, (1.0 - mainWeight) * size.x);
@@ -225,6 +261,10 @@ export async function createRenderer(canvas: HTMLCanvasElement, copland: Copland
     return [gridOffsetX, gridOffsetY, gridOffsetX + instrumentWidth, gridOffsetY + instrumentHeight]
   })
 
+  const paletteSelectorOffsetX =
+    instrumentExtents[instrumentExtents.length - 1][2] + instrumentSpacing / 2
+  const paletteSelectorOffsetY = instrumentExtents[instrumentExtents.length - 1][1]
+
   function getCellPosition(i: number, j: number, instrumentIdx: number): [number, number] {
     const instrumentExtent = instrumentExtents[instrumentIdx]
     const gridOffsetX = instrumentExtent[0]
@@ -235,10 +275,16 @@ export async function createRenderer(canvas: HTMLCanvasElement, copland: Copland
     ]
   }
 
-  function getCellFromMousePosition(
-    x: number,
-    y: number,
-  ): { instrumentIdx: number; measureIdx: number; soundIdx: number } | null {
+  function getCellFromMousePosition(x: number, y: number): HoveredCell | null {
+    if (
+      x >= paletteSelectorOffsetX &&
+      x <= paletteSelectorOffsetX + settings.cellSize &&
+      y >= paletteSelectorOffsetY &&
+      y <= paletteSelectorOffsetY + settings.cellSize
+    ) {
+      return { paletteSelector: true }
+    }
+
     for (let instrumentIdx = 0; instrumentIdx < instruments.length; instrumentIdx++) {
       const instrumentExtent = instrumentExtents[instrumentIdx]
       if (
@@ -258,12 +304,12 @@ export async function createRenderer(canvas: HTMLCanvasElement, copland: Copland
   const cellComponentCount = 12
   const cellCount = instruments.reduce(
     (acc, instrument) => acc + instrument.sounds * instrument.measureLength,
-    0,
+    1, // +1 for the palette selector
   )
   const cellData = new Float32Array(cellCount * cellComponentCount)
 
   // Returns true if all cells are at their destination and not animating
-  function updateCellData(instruments: Instrument[]): boolean {
+  function updateCellData(): boolean {
     let isAtDestination = true
     let i = 0
     let n = 0
@@ -273,9 +319,11 @@ export async function createRenderer(canvas: HTMLCanvasElement, copland: Copland
         for (let soundIdx = 0; soundIdx < instrument.sounds; soundIdx++) {
           const isActive = instrument.pads[measureIdx][soundIdx]
           const isHovered =
-            hoveredCell?.instrumentIdx === instIdx &&
-            hoveredCell?.measureIdx === measureIdx &&
-            hoveredCell?.soundIdx === soundIdx
+            hoveredCell &&
+            !('paletteSelector' in hoveredCell) &&
+            hoveredCell.instrumentIdx === instIdx &&
+            hoveredCell.measureIdx === measureIdx &&
+            hoveredCell.soundIdx === soundIdx
           const renderState = cellRenderStateMap.get(`${instIdx}-${measureIdx}-${soundIdx}`)!
 
           renderState.position.setDestination(getCellPosition(measureIdx, soundIdx, instIdx))
@@ -333,10 +381,67 @@ export async function createRenderer(canvas: HTMLCanvasElement, copland: Copland
         }
       }
     }
+
+    // palette selector cell
+    const isHovered = hoveredCell && 'paletteSelector' in hoveredCell
+    const renderState = cellRenderStateMap.get(paletteSelectorKey)!
+
+    renderState.position.setDestination([
+      paletteSelectorOffsetX + settings.cellSize / 2,
+      paletteSelectorOffsetY + settings.cellSize / 2,
+    ])
+    const color = COLORS[copland.instruments[0].soundPalette]
+    if (isHovered) {
+      renderState.color.setDestination(color)
+      renderState.opacity.setDestination(0.65)
+      renderState.size.setDestination([0.9, 0.9])
+    } else {
+      renderState.color.setDestination(color)
+      renderState.opacity.setDestination(settings.colorFade)
+      renderState.size.setDestination([1, 1])
+    }
+
+    const sizeAtDestination = renderState.size.tick()
+    const colorAtDestination = renderState.color.tick()
+    const positionAtDestination = renderState.position.tick()
+    const opacityAtDestination = renderState.opacity.tick()
+
+    isAtDestination =
+      isAtDestination &&
+      sizeAtDestination &&
+      colorAtDestination &&
+      positionAtDestination &&
+      opacityAtDestination
+
+    // cell color
+    const c = renderState.color.getCurrentValue()
+    const alpha = renderState.opacity.getCurrentValue()
+
+    cellData[n++] = c[0] / 255
+    cellData[n++] = c[1] / 255
+    cellData[n++] = c[2] / 255
+    cellData[n++] = alpha
+
+    // random values (these don't matter for the palette selector)
+    cellData[n++] = 0
+    cellData[n++] = 0
+    cellData[n++] = 0
+    cellData[n++] = 0
+
+    // cell size
+    const size = renderState.size.getCurrentValue()
+    cellData[n++] = size[0]
+    cellData[n++] = size[1]
+
+    // cell position
+    const position = renderState.position.getCurrentValue()
+    cellData[n++] = position[0]
+    cellData[n++] = position[1]
+
     return isAtDestination
   }
 
-  updateCellData(instruments)
+  updateCellData()
 
   const cellBuffer = createGPUBuffer(
     device,
@@ -426,8 +531,8 @@ export async function createRenderer(canvas: HTMLCanvasElement, copland: Copland
     },
   })
 
-  function render(instruments: Instrument[]) {
-    const isAtDestination = updateCellData(instruments)
+  function render() {
+    const isAtDestination = updateCellData()
     if (isAtDestination) return
     device.queue.writeBuffer(cellBuffer, 0, cellData)
 
@@ -462,7 +567,7 @@ export async function createRenderer(canvas: HTMLCanvasElement, copland: Copland
 
   function start() {
     requestAnimationFrame(function loop() {
-      render(instruments)
+      render()
       requestAnimationFrame(loop)
     })
   }
