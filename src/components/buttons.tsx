@@ -3,7 +3,7 @@ import Copland from '../copland'
 import Save from './save'
 
 export default function Buttons({ copland }: { copland: Copland }) {
-  const [showSave, setShowSave] = useState(false)
+  const [showShare, setShowShare] = useState(false)
   const [_, setTick] = useState(0) // just used to trigger a re-render
 
   const onKeydown = useCallback(
@@ -11,7 +11,7 @@ export default function Buttons({ copland }: { copland: Copland }) {
       const keyBindings: Record<string, () => void> = {
         Backspace: copland.clearAllPads.bind(copland),
         KeyE: copland.toggleEvolving.bind(copland),
-        KeyS: () => setShowSave((show: boolean) => !show),
+        KeyS: () => setShowShare((show: boolean) => !show),
         Space: copland.togglePlaying.bind(copland),
         Enter: copland.togglePlaying.bind(copland),
       }
@@ -43,8 +43,8 @@ export default function Buttons({ copland }: { copland: Copland }) {
       >
         info
       </div>
-      <div onClick={() => setShowSave(true)} className="save-btn">
-        save
+      <div onClick={() => setShowShare(true)} className="share-btn">
+        share
       </div>
       <div
         onClick={() => copland.toggleEvolving()}
@@ -52,7 +52,7 @@ export default function Buttons({ copland }: { copland: Copland }) {
       >
         evolve
       </div>
-      <Save show={showSave} hideSave={() => setShowSave(false)} hash={copland.encodeState()} />
+      <Save show={showShare} hideSave={() => setShowShare(false)} hash={copland.encodeState()} />
     </>
   )
 }

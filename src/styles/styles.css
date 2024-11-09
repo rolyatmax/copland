@@ -81,7 +81,7 @@ h1.title {
 }
 
 .open-info,
-.save-btn,
+.share-btn,
 .evolve-btn {
   display: inline-block;
   margin-right: 10px;
@@ -100,7 +100,7 @@ h1.title {
 }
 
 .open-info:hover,
-.save-btn:hover,
+.share-btn:hover,
 .evolve-btn:hover {
   color: #777;
   box-shadow: none;
@@ -111,8 +111,8 @@ h1.title {
   width: 1.6em;
 }
 
-.save-btn:hover {
-  width: 1.9em;
+.share-btn:hover {
+  width: 2.4em;
 }
 
 .evolve-btn:hover {
