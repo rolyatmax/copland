@@ -25,8 +25,8 @@ export type Instrument = {
 export type TogglePadAction = { instrument: number; row: number; column: number; active?: boolean }
 
 export default class Copland {
-  readonly tempo = 350
-  readonly evolveSpeed = 2000
+  readonly tempo = 370
+  readonly evolveSpeed = 3000
   ready = false
   loading = false
   playing = false
