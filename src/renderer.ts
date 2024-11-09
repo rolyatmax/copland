@@ -2,7 +2,7 @@ import * as random from 'canvas-sketch-util/random'
 import { setupWebGPU, createGPUBuffer } from './lib/webgpu'
 import { COLORS, WHITE } from './constants'
 import { createSpring } from './lib/spring-animator'
-import Copland from './copland'
+import Copland, { Instrument } from './copland'
 
 const settings = {
   seed: 1,
@@ -236,37 +236,10 @@ export async function createRenderer(canvas: HTMLCanvasElement, copland: Copland
     return mix(mainShape, outlineColor, outlineWeight);
   }`
 
-  const instrumentWidths = instruments.map(
-    (instrument) => settings.cellSize + (instrument.measureLength - 1) * settings.cellSpacing,
-  )
-  const instrumentSpacing = settings.cellSpacing * 2
-  const totalWidth =
-    instrumentWidths.reduce((acc, width) => acc + width, 0) +
-    instrumentSpacing * (instruments.length - 1)
-
-  const totalHeight = instruments.reduce(
-    (acc, instrument) =>
-      Math.max(acc, settings.cellSize + (instrument.sounds - 1) * settings.cellSpacing),
-    0,
-  )
-  const boardOffsetX = (context.canvas.width - totalWidth) / 2
-  const boardOffsetY = settings.marginTop
-
-  const instrumentExtents = instrumentWidths.map((instrumentWidth, idx) => {
-    const instrument = instruments[idx]
-    const instrumentHeight = settings.cellSize + (instrument.sounds - 1) * settings.cellSpacing
-    const instrumentOffsetX = instrumentWidths.slice(0, idx).reduce((acc, width) => acc + width, 0)
-    const gridOffsetX = instrumentOffsetX + boardOffsetX + instrumentSpacing * idx
-    const gridOffsetY = (totalHeight - instrumentHeight) / 2 + boardOffsetY
-    return [gridOffsetX, gridOffsetY, gridOffsetX + instrumentWidth, gridOffsetY + instrumentHeight]
-  })
-
-  const paletteSelectorOffsetX =
-    instrumentExtents[instrumentExtents.length - 1][2] + instrumentSpacing / 2
-  const paletteSelectorOffsetY = instrumentExtents[instrumentExtents.length - 1][1]
+  const layout = new Layout(instruments, [context.canvas.width, context.canvas.height])
 
   function getCellPosition(i: number, j: number, instrumentIdx: number): [number, number] {
-    const instrumentExtent = instrumentExtents[instrumentIdx]
+    const instrumentExtent = layout.instrumentExtents[instrumentIdx]
     const gridOffsetX = instrumentExtent[0]
     const gridOffsetY = instrumentExtent[1]
     return [
@@ -277,16 +250,16 @@ export async function createRenderer(canvas: HTMLCanvasElement, copland: Copland
 
   function getCellFromMousePosition(x: number, y: number): HoveredCell | null {
     if (
-      x >= paletteSelectorOffsetX &&
-      x <= paletteSelectorOffsetX + settings.cellSize &&
-      y >= paletteSelectorOffsetY &&
-      y <= paletteSelectorOffsetY + settings.cellSize
+      x >= layout.paletteSelectorOffset[0] &&
+      x <= layout.paletteSelectorOffset[0] + settings.cellSize &&
+      y >= layout.paletteSelectorOffset[1] &&
+      y <= layout.paletteSelectorOffset[1] + settings.cellSize
     ) {
       return { paletteSelector: true }
     }
 
     for (let instrumentIdx = 0; instrumentIdx < instruments.length; instrumentIdx++) {
-      const instrumentExtent = instrumentExtents[instrumentIdx]
+      const instrumentExtent = layout.instrumentExtents[instrumentIdx]
       if (
         x >= instrumentExtent[0] &&
         x <= instrumentExtent[2] &&
@@ -387,8 +360,8 @@ export async function createRenderer(canvas: HTMLCanvasElement, copland: Copland
     const renderState = cellRenderStateMap.get(paletteSelectorKey)!
 
     renderState.position.setDestination([
-      paletteSelectorOffsetX + settings.cellSize / 2,
-      paletteSelectorOffsetY + settings.cellSize / 2,
+      layout.paletteSelectorOffset[0] + settings.cellSize / 2,
+      layout.paletteSelectorOffset[1] + settings.cellSize / 2,
     ])
     const color = COLORS[copland.instruments[0].soundPalette]
     if (isHovered) {
@@ -532,6 +505,7 @@ export async function createRenderer(canvas: HTMLCanvasElement, copland: Copland
   })
 
   function render() {
+    layout.update(instruments, [context.canvas.width, context.canvas.height])
     const isAtDestination = updateCellData()
     if (isAtDestination) return
     device.queue.writeBuffer(cellBuffer, 0, cellData)
@@ -573,4 +547,54 @@ export async function createRenderer(canvas: HTMLCanvasElement, copland: Copland
   }
 
   return { start }
+}
+
+class Layout {
+  instrumentExtents!: [number, number, number, number][]
+  paletteSelectorOffset!: [number, number]
+
+  constructor(instruments: Instrument[], canvasDims: [number, number]) {
+    this.update(instruments, canvasDims)
+  }
+
+  update(instruments: Instrument[], canvasDims: [number, number]) {
+    const instrumentWidths = instruments.map(
+      (instrument) => settings.cellSize + (instrument.measureLength - 1) * settings.cellSpacing,
+    )
+    const instrumentSpacing = settings.cellSpacing * 2
+    const totalWidth =
+      instrumentWidths.reduce((acc, width) => acc + width, 0) +
+      instrumentSpacing * (instruments.length - 1)
+
+    const totalHeight = instruments.reduce(
+      (acc, instrument) =>
+        Math.max(acc, settings.cellSize + (instrument.sounds - 1) * settings.cellSpacing),
+      0,
+    )
+    const boardOffsetX = (canvasDims[0] - totalWidth) / 2
+    const boardOffsetY = canvasDims[1] - totalHeight - settings.marginTop * 2
+
+    const instrumentExtents = instrumentWidths.map((instrumentWidth, idx) => {
+      const instrument = instruments[idx]
+      const instrumentHeight = settings.cellSize + (instrument.sounds - 1) * settings.cellSpacing
+      const instrumentOffsetX = instrumentWidths
+        .slice(0, idx)
+        .reduce((acc, width) => acc + width, 0)
+      const gridOffsetX = instrumentOffsetX + boardOffsetX + instrumentSpacing * idx
+      const gridOffsetY = (totalHeight - instrumentHeight) / 2 + boardOffsetY
+      return [
+        gridOffsetX,
+        gridOffsetY,
+        gridOffsetX + instrumentWidth,
+        gridOffsetY + instrumentHeight,
+      ] as [number, number, number, number]
+    })
+
+    const paletteSelectorOffsetX =
+      instrumentExtents[instrumentExtents.length - 1][2] + instrumentSpacing / 2
+    const paletteSelectorOffsetY = instrumentExtents[instrumentExtents.length - 1][1]
+
+    this.instrumentExtents = instrumentExtents
+    this.paletteSelectorOffset = [paletteSelectorOffsetX, paletteSelectorOffsetY]
+  }
 }
