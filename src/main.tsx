@@ -7,13 +7,19 @@ import Copland from './copland'
 import instrumentConfig from './instrument-config'
 import './styles/normalize.css'
 import './styles/styles.css'
+import { checkWebGPU } from './lib/webgpu.ts'
 
-const canPlayMP3 = new Audio().canPlayType('audio/mp3')
-if (!canPlayMP3 || canPlayMP3 === 'maybe') {
-  let msg = 'This website only works with browsers that can play mp3s.'
-  alert(msg)
-  throw new Error(msg)
-}
+await checkWebGPU()
+
+// const canPlayMP3 = new Audio().canPlayType('audio/mp3')
+// if (!canPlayMP3 || canPlayMP3 === 'maybe') {
+//   document.body.innerHTML = `
+//   <div style="font-size: 1.5em; margin: 100px auto; max-width: 800px; text-align: center;">
+//     This demo requires a browser that can play mp3s.
+//   </div>
+//   `
+//   throw new Error('MP3 not supported')
+// }
 
 const copland = new Copland(instrumentConfig)
 const renderer = await createRenderer(document.querySelector('canvas')!, copland)

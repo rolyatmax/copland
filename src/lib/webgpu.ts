@@ -15,21 +15,38 @@ export function createGPUBuffer(
   return buffer
 }
 
-export async function setupWebGPU(canvas?: HTMLCanvasElement) {
-  if (!window.navigator.gpu) {
-    const message = `
-    Your current browser does not support WebGPU! Make sure you are on a system
-    with WebGPU enabled, e.g. Chrome or Safari (with the WebGPU flag enabled).
+export async function checkWebGPU() {
+  function showError() {
+    document.body.innerHTML = `
+    <div style="font-size: 1.5em; margin: 100px auto; max-width: 800px; text-align: center;">
+      This demo requires WebGPU.
+    </div>
     `
-    document.body.innerText = message
-    throw new Error(message)
+  }
+
+  if (!window.navigator.gpu) {
+    showError()
+    throw new Error('WebGPU not supported')
   }
 
   const adapter = await window.navigator.gpu.requestAdapter()
-  if (!adapter) throw new Error('Failed to requestAdapter()')
+  if (!adapter) {
+    showError()
+    throw new Error('WebGPU: Failed to call requestAdapter()')
+  }
 
   const device = await adapter.requestDevice()
-  if (!device) throw new Error('Failed to requestDevice()')
+  if (!device) {
+    showError()
+    throw new Error('WebGPU: Failed to call requestDevice()')
+  }
+}
+
+export async function setupWebGPU(canvas?: HTMLCanvasElement) {
+  await checkWebGPU()
+
+  const adapter = await window.navigator.gpu.requestAdapter()
+  const device = await adapter!.requestDevice()
 
   if (!canvas) {
     canvas = document.body.appendChild(document.createElement('canvas'))
