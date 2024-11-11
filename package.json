@@ -9,9 +9,13 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@types/gl-vec4": "^1.0.3",
     "@types/howler": "^2.2.12",
     "@types/react": "^18.3.11",
+    "@webgpu/types": "^0.1.50",
     "bases": "^0.2.1",
+    "canvas-sketch-util": "^1.10.0",
+    "gl-vec4": "^1.0.1",
     "howler": "^2.2.4",
     "object-hash": "^3.0.0",
     "prettier": "^3.3.3",

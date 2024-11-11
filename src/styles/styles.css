@@ -19,16 +19,14 @@
   font-weight: 200;
 }
 
-#main-view {
-  left: 0;
+#app {
+  transition: opacity 300ms linear 500ms;
+  opacity: 0;
   position: relative;
-  -webkit-transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-  -moz-transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-  transition: left 0.5s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-#main-view.inactive {
-  left: 500px;
+#app.show {
+  opacity: 1;
 }
 
 h1,
@@ -73,14 +71,17 @@ h1.title {
   top: 0;
 }
 
-.btns {
+#btns {
   position: absolute;
-  top: 2%;
-  left: 2%;
+  top: 25px;
+  left: 0;
+  padding: 0 25px;
+  width: 100vw;
+  text-align: left;
 }
 
 .open-info,
-.save-btn,
+.share-btn,
 .evolve-btn {
   display: inline-block;
   margin-right: 10px;
@@ -99,7 +100,7 @@ h1.title {
 }
 
 .open-info:hover,
-.save-btn:hover,
+.share-btn:hover,
 .evolve-btn:hover {
   color: #777;
   box-shadow: none;
@@ -110,8 +111,8 @@ h1.title {
   width: 1.6em;
 }
 
-.save-btn:hover {
-  width: 1.9em;
+.share-btn:hover {
+  width: 2.4em;
 }
 
 .evolve-btn:hover {
@@ -269,7 +270,7 @@ h1.title {
   width: 0;
   height: 15px;
   position: fixed;
-  bottom: 95%;
+  bottom: 97%;
   left: 0;
   background-color: none;
   transition: all 500ms ease;
@@ -328,4 +329,13 @@ h1.title {
 .opt-in.hide {
   opacity: 0;
   pointer-events: none;
+}
+
+#board {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -2;
 }
